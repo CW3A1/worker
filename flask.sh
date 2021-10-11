@@ -1,1 +1,1 @@
-podman run -d -p 11000:11000 --name=flask cee0d190181
+podman run -d -p 11000:11000 --name=flask flask-podman
