@@ -12,4 +12,5 @@ COPY createDB.sql .
 RUN sqlite3 sqlite.db < createDB.sql
 COPY database.py .
 # RUN FLASK
+COPY environment.py .
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=11001"]

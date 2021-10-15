@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from database import *
-import requests
-import os
+import requests, environment
 
 app = Flask(__name__)
 
