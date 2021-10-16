@@ -7,26 +7,28 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello, Flask!'
 
-@app.route('/api/<table>/<column>')
-def showColumn(table, column):
-    if column=="all":
-        return jsonify(database.selectAll(table))
-    return jsonify(database.selectAllColumn(column, table))
+# TASKS ENDPOINTS
+@app.route('/api/task/list')
+def listTask():
+    return jsonify(database.listTask())
 
-@app.route('/api/addTask')
+@app.route('/api/task/add')
 def addTask():
     task_id = str(uuid.uuid4())[:8]
-    database.addTask(task_id)
-    return redirect(url_for('statusTask', task_id=task_id))
+    return jsonify(database.addTask(task_id))
 
-@app.route('/api/completeTask/<task_id>')
+@app.route('/api/task/complete/<task_id>')
 def completeTask(task_id):
-    database.completeTask(task_id)
-    return redirect(url_for('statusTask', task_id=task_id))
+    return jsonify(database.completeTask(task_id))
 
-@app.route('/api/statusTask/<task_id>')
+@app.route('/api/task/status/<task_id>')
 def statusTask(task_id):
     return jsonify(database.statusTask(task_id))
+
+# SCHEDULE ENDPOINTS
+@app.route('/api/scheduler/list')
+def listScheduler():
+    return jsonify(database.listScheduler())
 
 # @app.route('/api/pushurl/<id>/<status>')
 # def pushJSONtoDB(id, status):
