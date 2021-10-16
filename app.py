@@ -3,6 +3,11 @@ import uuid, database, environment
 
 app = Flask(__name__)
 
+def corsonify(resp):
+    jsonifiedResp = jsonify(resp)
+    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "*")
+    return jsonifiedResp
+
 @app.route('/')
 def hello_world():
     return 'Hello, Flask!'
@@ -10,37 +15,37 @@ def hello_world():
 # TASK ENDPOINTS
 @app.route('/api/task/list')
 def listTask():
-    return jsonify(database.listTask())
+    return corsonify(database.listTask())
 
 @app.route('/api/task/add')
 def addTask():
     task_id = str(uuid.uuid4())[:8]
-    return jsonify(database.addTask(task_id))
+    return corsonify(database.addTask(task_id))
 
 @app.route('/api/task/complete/<task_id>')
 def completeTask(task_id):
-    return jsonify(database.completeTask(task_id))
+    return corsonify(database.completeTask(task_id))
 
 @app.route('/api/task/status/<task_id>')
 def statusTask(task_id):
-    return jsonify(database.statusTask(task_id))
+    return corsonify(database.statusTask(task_id))
 
 # SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
 def listScheduler():
-    return jsonify(database.listScheduler())
+    return corsonify(database.listScheduler())
 
 @app.route('/api/scheduler/free/<pc>')
 def freeScheduler(pc):
-    return jsonify(database.freeScheduler(pc))
+    return corsonify(database.freeScheduler(pc))
 
 @app.route('/api/scheduler/busy/<pc>')
 def busyScheduler(pc):
-    return jsonify(database.busyScheduler(pc))
+    return corsonify(database.busyScheduler(pc))
 
 @app.route('/api/scheduler/status/<pc>')
 def statusScheduler(pc):
-    return jsonify(database.statusScheduler(pc))
+    return corsonify(database.statusScheduler(pc))
 
 # @app.route('/api/pushurl/<id>/<status>')
 # def pushJSONtoDB(id, status):
