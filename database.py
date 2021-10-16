@@ -50,3 +50,24 @@ def listScheduler():
     results = cursor.fetchall()
     closeConnection(connection, cursor)
     return {result[0]:result[1] for result in results}
+
+def freeScheduler(pc):
+    connection, cursor = connectToDB()
+    cursor.execute(f"UPDATE {environment.db_table_scheduler} SET status = 0 WHERE pc = '{pc}';")
+    connection.commit()
+    closeConnection(connection, cursor)
+    return statusScheduler(pc)
+
+def busyScheduler(pc):
+    connection, cursor = connectToDB()
+    cursor.execute(f"UPDATE {environment.db_table_scheduler} SET status = 1 WHERE pc = '{pc}';")
+    connection.commit()
+    closeConnection(connection, cursor)
+    return statusScheduler(pc)
+
+def statusScheduler(pc):
+    connection, cursor = connectToDB()
+    cursor.execute(f"SELECT * FROM {environment.db_table_scheduler} WHERE pc = '{pc}';")
+    results = cursor.fetchall()
+    closeConnection(connection, cursor)
+    return {result[0]:result[1] for result in results}

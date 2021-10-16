@@ -7,7 +7,7 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello, Flask!'
 
-# TASKS ENDPOINTS
+# TASK ENDPOINTS
 @app.route('/api/task/list')
 def listTask():
     return jsonify(database.listTask())
@@ -25,10 +25,22 @@ def completeTask(task_id):
 def statusTask(task_id):
     return jsonify(database.statusTask(task_id))
 
-# SCHEDULE ENDPOINTS
+# SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
 def listScheduler():
     return jsonify(database.listScheduler())
+
+@app.route('/api/scheduler/free/<pc>')
+def freeScheduler(pc):
+    return jsonify(database.freeScheduler(pc))
+
+@app.route('/api/scheduler/busy/<pc>')
+def busyScheduler(pc):
+    return jsonify(database.busyScheduler(pc))
+
+@app.route('/api/scheduler/status/<pc>')
+def statusScheduler(pc):
+    return jsonify(database.statusScheduler(pc))
 
 # @app.route('/api/pushurl/<id>/<status>')
 # def pushJSONtoDB(id, status):
