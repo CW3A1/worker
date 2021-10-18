@@ -4,11 +4,6 @@ WORKDIR /app
 # SETUP PYTHON ENV
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
-# SETUP DATABASE
-RUN apt update
-RUN apt install -y libsqlite3-dev sqlite3
-COPY createDB.sql .
-RUN sqlite3 sqlite.db < createDB.sql
 # RUN FLASK
 COPY *.py .
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=11001"]
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=11001"]
