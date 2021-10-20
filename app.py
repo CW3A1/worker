@@ -1,5 +1,9 @@
-from flask import Flask, jsonify, redirect, url_for
-import uuid, database, environment, runNext
+import uuid
+
+from flask import Flask, jsonify
+
+import database
+import openfoam
 
 app = Flask(__name__)
 
@@ -14,60 +18,47 @@ def hello_world():
 
 # TASK ENDPOINTS
 @app.route('/api/task/list')
-def listTask():
-    return corsonify(database.listTask())
+def list_task():
+    return corsonify(database.list_task())
 
 @app.route('/api/task/add')
-def addTask():
+def add_task():
     task_id = str(uuid.uuid4())[:8]
-    resp = database.addTask(task_id)
-    runNext.runNext()
+    resp = database.add_task(task_id)
+    openfoam.next_openfoam_thread()
     return corsonify(resp)
 
 @app.route('/api/task/complete/<task_id>')
-def completeTask(task_id):
-    resp = database.completeTask(task_id)
-    runNext.runNext()
+def complete_task(task_id):
+    resp = database.complete_task(task_id)
+    openfoam.next_openfoam_thread()
     return corsonify(resp)
 
 @app.route('/api/task/status/<task_id>')
-def statusTask(task_id):
-    return corsonify(database.statusTask(task_id))
+def status_task(task_id):
+    return corsonify(database.status_task(task_id))
 
 @app.route('/api/task/random/pending')
-def oldestPendingTask():
-    return corsonify(database.oldestPendingTask())
+def oldest_pending_task():
+    return corsonify(database.oldest_pending_task())
 
 # SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
-def listScheduler():
-    return corsonify(database.listScheduler())
+def list_scheduler():
+    return corsonify(database.list_scheduler())
 
 @app.route('/api/scheduler/free/<pc>')
-def freeScheduler(pc):
-    return corsonify(database.freeScheduler(pc))
+def free_scheduler(pc):
+    return corsonify(database.free_scheduler(pc))
 
 @app.route('/api/scheduler/busy/<pc>')
-def busyScheduler(pc):
-    return corsonify(database.busyScheduler(pc))
+def busy_scheduler(pc):
+    return corsonify(database.busy_scheduler(pc))
 
 @app.route('/api/scheduler/status/<pc>')
-def statusScheduler(pc):
-    return corsonify(database.statusScheduler(pc))
+def status_scheduler(pc):
+    return corsonify(database.status_scheduler(pc))
 
 @app.route('/api/scheduler/random/free')
-def randomFreeScheduler():
-    return corsonify(database.randomFreeScheduler())
-
-# @app.route('/api/pushurl/<id>/<status>')
-# def pushJSONtoDB(id, status):
-#     if request.args.get('secret')==environment.db_secret:
-#         if id not in (None, "") and status not in (0, 1):
-#             resp = requests.get(f"{environment.db_url}/api/column/id")
-#             print(id, resp.json(), id not in resp.json())
-#             if id not in resp.json():
-#                 requests.post(f"{environment.db_url}/api/push", json={"id": int(id), "status": int(status)})
-#                 return redirect(url_for('showAPI'))
-#             return jsonify({"error": "id must be unique"})
-#         return jsonify({"error": "invalid id or status provided"})
-#     return jsonify({"error": "invalid secret provided"})
+def random_free_scheduler():
+    return corsonify(database.random_free_scheduler())
