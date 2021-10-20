@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, redirect, url_for
-import uuid, database, environment
+import uuid, database, environment, runNext
 
 app = Flask(__name__)
 
@@ -20,15 +20,23 @@ def listTask():
 @app.route('/api/task/add')
 def addTask():
     task_id = str(uuid.uuid4())[:8]
-    return corsonify(database.addTask(task_id))
+    resp = database.addTask(task_id)
+    runNext.runNext()
+    return corsonify(resp)
 
 @app.route('/api/task/complete/<task_id>')
 def completeTask(task_id):
-    return corsonify(database.completeTask(task_id))
+    resp = database.completeTask(task_id)
+    runNext.runNext()
+    return corsonify(resp)
 
 @app.route('/api/task/status/<task_id>')
 def statusTask(task_id):
     return corsonify(database.statusTask(task_id))
+
+@app.route('/api/task/random/pending')
+def oldestPendingTask():
+    return corsonify(database.oldestPendingTask())
 
 # SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
@@ -46,6 +54,10 @@ def busyScheduler(pc):
 @app.route('/api/scheduler/status/<pc>')
 def statusScheduler(pc):
     return corsonify(database.statusScheduler(pc))
+
+@app.route('/api/scheduler/random/free')
+def randomFreeScheduler():
+    return corsonify(database.randomFreeScheduler())
 
 # @app.route('/api/pushurl/<id>/<status>')
 # def pushJSONtoDB(id, status):

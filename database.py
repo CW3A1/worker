@@ -71,3 +71,17 @@ def statusScheduler(pc):
     results = cursor.fetchall()
     closeConnection(connection, cursor)
     return {result[0]:result[1] for result in results}
+
+def oldestPendingTask():
+    connection, cursor = connectToDB()
+    cursor.execute(f"SELECT * FROM {environment.db_table_tasks} WHERE status = 0 ORDER BY unix_time ASC LIMIT 1;")
+    results = cursor.fetchall()
+    closeConnection(connection, cursor)
+    return [result[0] for result in results][0] if len(results) else None
+
+def randomFreeScheduler():
+    connection, cursor = connectToDB()
+    cursor.execute(f"SELECT * FROM {environment.db_table_scheduler} WHERE status = 0 ORDER BY RANDOM() LIMIT 1;")
+    results = cursor.fetchall()
+    closeConnection(connection, cursor)
+    return [result[0] for result in results][0] if len(results) else None
