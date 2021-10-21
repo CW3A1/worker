@@ -17,12 +17,12 @@ def corsonify(resp):
 def list_task():
     return corsonify(database.list_task())
 
-@app.route('/api/task/add', methods=["POST"])
+@app.route('/api/task/add', methods=["GET", "POST"])
 def add_task():
     task_id = str(uuid.uuid4())[:8]
     r = request.json
-    r = {int(x):r[x] for x in r}
-    resp = database.add_task(task_id, )
+    r = [float(r[x][0]) for x in r] + [float(r[x][1]) for x in r]
+    resp = database.add_task(task_id, r)
     openfoam.next_openfoam_thread()
     return corsonify(resp)
 
