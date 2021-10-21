@@ -20,7 +20,9 @@ def list_task():
 @app.route('/api/task/add', methods=["POST"])
 def add_task():
     task_id = str(uuid.uuid4())[:8]
-    resp = database.add_task(task_id, request.json)
+    r = request.json
+    r = {int(x):r[x] for x in r}
+    resp = database.add_task(task_id, )
     openfoam.next_openfoam_thread()
     return corsonify(resp)
 
