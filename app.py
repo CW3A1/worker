@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 import database
 import openfoam
@@ -12,19 +12,15 @@ def corsonify(resp):
     jsonifiedResp.headers.add("Access-Control-Allow-Origin", "*")
     return jsonifiedResp
 
-@app.route('/')
-def hello_world():
-    return 'Hello, Flask!'
-
 # TASK ENDPOINTS
 @app.route('/api/task/list')
 def list_task():
     return corsonify(database.list_task())
 
-@app.route('/api/task/add')
+@app.route('/api/task/add', methods=["POST"])
 def add_task():
     task_id = str(uuid.uuid4())[:8]
-    resp = database.add_task(task_id)
+    resp = database.add_task(task_id, request.json)
     openfoam.next_openfoam_thread()
     return corsonify(resp)
 
@@ -37,10 +33,6 @@ def complete_task(task_id):
 @app.route('/api/task/status/<task_id>')
 def status_task(task_id):
     return corsonify(database.status_task(task_id))
-
-@app.route('/api/task/random/pending')
-def oldest_pending_task():
-    return corsonify(database.oldest_pending_task())
 
 # SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
@@ -58,7 +50,3 @@ def busy_scheduler(pc):
 @app.route('/api/scheduler/status/<pc>')
 def status_scheduler(pc):
     return corsonify(database.status_scheduler(pc))
-
-@app.route('/api/scheduler/random/free')
-def random_free_scheduler():
-    return corsonify(database.random_free_scheduler())
