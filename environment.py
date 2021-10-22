@@ -1,7 +1,9 @@
+"""Module that provides environment variables"""
+
 from os import getenv
 
-db_file = getenv('db_file')
-db_table_tasks = getenv('db_table_tasks')
-db_table_scheduler = getenv('db_table_scheduler')
-db_table_users = getenv('db_table_users')
-auth_secret = getenv('auth_secret')
+DB_FILE = getenv('db_file')
+DB_TABLE_TASKS = getenv('db_table_tasks')
+DB_TABLE_SCHEDULER = getenv('db_table_scheduler')
+DB_TABLE_USERS = getenv('db_table_users')
+AUTH_SECRET = getenv('auth_secret')
