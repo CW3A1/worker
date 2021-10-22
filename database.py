@@ -21,16 +21,16 @@ def select_all_column(column, table):
     return [x for i in results for x in i]
 
 # TASK FUNCTIONS
-def list_task():
+def list_task(identifier = ''):
     connection, cursor = connect_to_db()
-    cursor.execute(f"SELECT * FROM {environment.db_table_tasks};")
+    cursor.execute(f"SELECT * FROM {environment.db_table_tasks} WHERE uuid = '{identifier}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
-    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5]} for result in results}
+    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]} for result in results}
 
-def add_task(task_id, input_values):
+def add_task(task_id, input_values, identifier = ''):
     connection, cursor = connect_to_db()
-    cursor.execute(f"INSERT INTO {environment.db_table_tasks} (task_id, unix_time, input_values) VALUES ('{task_id}', {time.time_ns()}, '{input_values}');")
+    cursor.execute(f"INSERT INTO {environment.db_table_tasks} (task_id, unix_time, input_values, uuid) VALUES ('{task_id}', {time.time_ns()}, '{input_values}', '{identifier}');")
     connection.commit()
     close_connection(connection, cursor)
     return status_task(task_id)
@@ -56,7 +56,7 @@ def status_task(task_id):
     cursor.execute(f"SELECT * FROM {environment.db_table_tasks} WHERE task_id = '{task_id}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
-    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5]} for result in results}
+    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]} for result in results}
 
 def oldest_pending_task():
     connection, cursor = connect_to_db()
@@ -64,6 +64,13 @@ def oldest_pending_task():
     results = cursor.fetchall()
     close_connection(connection, cursor)
     return [result[0] for result in results][0] if len(results) else None
+
+def task_exists(task_id):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_tasks} WHERE task_id = '{task_id}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return len(results) > 0
 
 # SCHEDULER FUNCTIONS
 def list_scheduler():
@@ -100,3 +107,46 @@ def random_free_scheduler():
     results = cursor.fetchall()
     close_connection(connection, cursor)
     return [result[0] for result in results][0] if len(results) else None
+
+# USER FUNCTION
+def user_exists(identifier):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_users} WHERE uuid = '{identifier}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return len(results) > 0
+
+def jwt_exists(jwt):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_users} WHERE jwt_token = '{jwt}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return len(results) > 0
+
+def user_hash(identifier):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_users} WHERE uuid = '{identifier}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return results[0][1]
+
+def add_user(identifier, hashed_password, jwt):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"INSERT INTO {environment.db_table_users} VALUES ('{identifier}', '{hashed_password}', '{jwt}');")
+    connection.commit()
+    close_connection(connection, cursor)
+    return user_info(identifier)
+
+def user_info(identifier):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_users} WHERE uuid = '{identifier}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return {'uuid': results[0][0], 'jwt': results[0][2]}
+
+def jwt_to_uuid(jwt):
+    connection, cursor = connect_to_db()
+    cursor.execute(f"SELECT * FROM {environment.db_table_users} WHERE jwt_token = '{jwt}';")
+    results = cursor.fetchall()
+    close_connection(connection, cursor)
+    return results[0][0]
