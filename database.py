@@ -23,7 +23,7 @@ def select_all_column(column, table):
 # TASK FUNCTIONS
 def list_task(identifier = ''):
     connection, cursor = connect_to_db()
-    cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS} WHERE uuid = '{identifier}';")
+    cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS}{(' WHERE uuid = ' + chr(39) + identifier + chr(39)) if identifier != 'all' else ''};")
     results = cursor.fetchall()
     close_connection(connection, cursor)
     return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]} for result in results}

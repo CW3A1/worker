@@ -1,17 +1,58 @@
 import uuid
+from datetime import datetime
 
-from flask import Flask, jsonify, redirect, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 import auth
 import database
+import environment
 import openfoam
 
 app = Flask(__name__)
 
+# JINJA FILTERS
+@app.template_filter('human_time')
+def human_time(s):
+    dt = datetime.fromtimestamp(int(s) // 1000000000)
+    t = dt.strftime(f'%Y-%m-%d %H:%M:%S')
+    return t
+
+@app.template_filter('human_status')
+def human_time(s):
+    s = int(s)
+    if s == 0:
+        return 'Created'
+    elif s == 1:
+        return 'Complete'
+    elif s == 2:
+        return 'Pending'
+    return 'Unknown'
+
+
+# EXTRA
 def corsonify(resp):
     jsonifiedResp = jsonify(resp)
-    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "*")
+    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "http://localhost:5000")
+    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "http://localhost:11000")
+    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "https://pno3cwa1.student.cs.kuleuven.be")
+    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "https://pno3cwa2.student.cs.kuleuven.be")
     return jsonifiedResp
+
+@app.route("/")
+def tasks():
+    return render_template("tasks.html", title='Tasks', task_data=database.list_task('all'))
+
+@app.route("/task/<task_id>")
+def view_task(task_id):
+    return render_template("view_task.html", title=f'Task info', task_id=task_id, task_data=database.status_task(task_id))
+
+@app.route("/users")
+def users():
+    return render_template("users.html", title='Users', user_data=database.select_all_column('uuid', environment.DB_TABLE_USERS))
+
+@app.route("/user/<identifier>")
+def view_user(identifier):
+    return render_template("view_user.html", title=f'Task info', user_data=database.user_info(identifier), task_data=database.list_task(identifier))
 
 # TASK ENDPOINTS
 @app.route('/api/task/list')
