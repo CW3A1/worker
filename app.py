@@ -38,13 +38,19 @@ def corsonify(resp):
     jsonifiedResp.headers.add("Access-Control-Allow-Origin", "https://pno3cwa2.student.cs.kuleuven.be")
     return jsonifiedResp
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html")
+
 @app.route("/")
 def tasks():
     return render_template("tasks.html", title='Tasks', task_data=database.list_task('all'))
 
 @app.route("/task/<task_id>")
 def view_task(task_id):
-    return render_template("view_task.html", title=f'Task info', task_id=task_id, task_data=database.status_task(task_id))
+    if database.task_exists(task_id):
+        return render_template("view_task.html", title=f'Task info', task_id=task_id, task_data=database.status_task(task_id))
+    return render_template("404.html")
 
 @app.route("/users")
 def users():
@@ -52,7 +58,9 @@ def users():
 
 @app.route("/user/<identifier>")
 def view_user(identifier):
-    return render_template("view_user.html", title=f'Task info', user_data=database.user_info(identifier), task_data=database.list_task(identifier))
+    if database.user_exists(identifier):
+        return render_template("view_user.html", title=f'Task info', user_data=database.user_info(identifier), task_data=database.list_task(identifier))
+    return render_template("404.html")
 
 # TASK ENDPOINTS
 @app.route('/api/task/list')
