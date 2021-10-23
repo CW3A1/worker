@@ -30,17 +30,22 @@ def human_time(s):
 
 
 # EXTRA
-def corsonify(resp):
-    jsonifiedResp = jsonify(resp)
-    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "http://localhost:5000")
-    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "http://localhost:11000")
-    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "https://pno3cwa1.student.cs.kuleuven.be")
-    jsonifiedResp.headers.add("Access-Control-Allow-Origin", "https://pno3cwa2.student.cs.kuleuven.be")
-    return jsonifiedResp
+@app.after_request
+def securityHeader(response):
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:5000")
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:11000")
+    response.headers.add("Access-Control-Allow-Origin", "https://pno3cwa1.student.cs.kuleuven.be")
+    response.headers.add("Access-Control-Allow-Origin", "https://pno3cwa2.student.cs.kuleuven.be")
+    response.headers.add("Content-Security-Policy", 'default-src \'self\' unpkg.com')
+    return response
 
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html")
+
+@app.route('/robots.txt')
+def static_file():
+    return app.send_static_file('robots.txt')
 
 @app.route("/")
 def tasks():
@@ -65,7 +70,7 @@ def view_user(identifier):
 # TASK ENDPOINTS
 @app.route('/api/task/list')
 def list_task():
-    return corsonify(database.list_task())
+    return jsonify(database.list_task())
 
 @app.route('/api/task/add', methods=["POST"])
 def add_task():
@@ -80,12 +85,12 @@ def add_task():
                 identifier = database.jwt_to_uuid(jwt)
                 resp = database.add_task(task_id, r, identifier)
                 openfoam.next_openfoam_thread()
-                return corsonify(resp)
-            return corsonify({"error": "token does not exist"})
-        return corsonify({"error": "authorization header is malformed"})
+                return jsonify(resp)
+            return jsonify({"error": "token does not exist"})
+        return jsonify({"error": "authorization header is malformed"})
     resp = database.add_task(task_id, r)
     openfoam.next_openfoam_thread()
-    return corsonify(resp)
+    return jsonify(resp)
 
 @app.route('/api/task/status/<task_id>')
 def status_task(task_id):
@@ -98,31 +103,31 @@ def status_task(task_id):
                 if database.jwt_exists(jwt):
                     identifier = database.jwt_to_uuid(jwt)
                     if identifier == resp[task_id]['uuid']:
-                        return corsonify(resp)
-                    return corsonify({"error": "token does not match task"})
-                return corsonify({"error": "token does not exist"})
-            return corsonify({"error": "authorization header is malformed"})
+                        return jsonify(resp)
+                    return jsonify({"error": "token does not match task"})
+                return jsonify({"error": "token does not exist"})
+            return jsonify({"error": "authorization header is malformed"})
         if resp[task_id]['uuid'] == '':
-            return corsonify(resp)
-        return corsonify({"error": "authorization is required"})
-    return corsonify({"error": "task does not exist"})
+            return jsonify(resp)
+        return jsonify({"error": "authorization is required"})
+    return jsonify({"error": "task does not exist"})
 
 # SCHEDULER ENDPOINTS
 @app.route('/api/scheduler/list')
 def list_scheduler():
-    return corsonify(database.list_scheduler())
+    return jsonify(database.list_scheduler())
 
 @app.route('/api/scheduler/free/<pc>')
 def free_scheduler(pc):
-    return corsonify(database.free_scheduler(pc))
+    return jsonify(database.free_scheduler(pc))
 
 @app.route('/api/scheduler/busy/<pc>')
 def busy_scheduler(pc):
-    return corsonify(database.busy_scheduler(pc))
+    return jsonify(database.busy_scheduler(pc))
 
 @app.route('/api/scheduler/status/<pc>')
 def status_scheduler(pc):
-    return corsonify(database.status_scheduler(pc))
+    return jsonify(database.status_scheduler(pc))
 
 # USER ENDPOINTS
 @app.route('/api/user/add', methods=['POST'])
@@ -133,9 +138,9 @@ def add_user():
         if not database.user_exists(identifier):
             hashed_password = auth.generate_hash(r['password'])
             jwt = auth.generate_jwt(identifier)
-            return corsonify(database.add_user(identifier, hashed_password, jwt))
-        return corsonify({"error": "user already exists"})
-    return corsonify({"error": "invalid email or password"})
+            return jsonify(database.add_user(identifier, hashed_password, jwt))
+        return jsonify({"error": "user already exists"})
+    return jsonify({"error": "invalid email or password"})
 
 @app.route('/api/user/auth', methods=['POST'])
 def auth_user():
@@ -144,10 +149,10 @@ def auth_user():
         identifier = auth.generate_uuid(r['email'])
         if database.user_exists(identifier):
             if auth.check_password(r['password'], database.user_hash(identifier)):
-                return corsonify(database.user_info(identifier))
-            return corsonify({"error": "wrong password"})
-        return corsonify({"error": "user does not exist"})
-    return corsonify({"error": "invalid email or password"})
+                return jsonify(database.user_info(identifier))
+            return jsonify({"error": "wrong password"})
+        return jsonify({"error": "user does not exist"})
+    return jsonify({"error": "invalid email or password"})
 
 @app.route('/api/user/tasks')
 def user_tasks():
@@ -157,7 +162,7 @@ def user_tasks():
             jwt = auth_header[7:]
             if database.jwt_exists(jwt):
                 identifier = database.jwt_to_uuid(jwt)
-                return corsonify(database.list_task(identifier))
-            return corsonify({"error": "token does not exist"})
-        return corsonify({"error": "authorization header is malformed"})
+                return jsonify(database.list_task(identifier))
+            return jsonify({"error": "token does not exist"})
+        return jsonify({"error": "authorization header is malformed"})
     return redirect(url_for('list_task'))
