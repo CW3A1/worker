@@ -72,7 +72,7 @@ def tasks():
 def login():
     if request.method == 'POST':
         resp = make_response()
-        resp.set_cookie("jwt", value=request.form.get("jwt"), expires=datetime.now()+timedelta(seconds=60))
+        resp.set_cookie("jwt", value=request.form.get("jwt"), expires=datetime.now()+timedelta(days=1))
         resp.headers['location'] = url_for('tasks') 
         return resp, 302
     return render_template("login.html", title='Login')
