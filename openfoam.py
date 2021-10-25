@@ -11,7 +11,7 @@ def openfoam_thread(data_points, pc, task_id):
     data_pointsy = data_points[4:]
     A = numpy.array([[int(x)**3, int(x)**2, int(x)**1, 1] for x in data_pointsx])
     b = numpy.array([[int(y)] for y in data_pointsy])
-    res = [arr[0] for arr in numpy.linalg.solve(A,b).tolist()]
+    res = [round(arr[0], 3) for arr in numpy.linalg.solve(A,b).tolist()]
     database.complete_task(task_id, res)
     database.free_scheduler(pc)
 
