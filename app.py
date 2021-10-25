@@ -55,6 +55,7 @@ def not_found():
 def robots():
     return app.send_static_file('robots.txt')
 
+# DASHBOARD
 @app.route("/")
 def tasks():
     return render_template("tasks.html", title='Tasks', task_data=database.list_task('all'))

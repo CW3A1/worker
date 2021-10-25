@@ -1,5 +1,3 @@
-"""Module that provides environment variables"""
-
 from os import getenv
 
 DB_FILE = getenv('db_file')

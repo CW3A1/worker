@@ -38,7 +38,7 @@ def get_row(table, s_column, s_value):
     cursor.execute(f"SELECT * FROM {table} WHERE {s_column} = '{s_value}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
-    return results[0]
+    return results[0] if results else []
 
 # UPDATE ROWS
 def complete_task(task_id, res):
