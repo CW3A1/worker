@@ -1,7 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import (Flask, jsonify, make_response, redirect, render_template,
+                   request, url_for)
 
 import auth
 import database
@@ -9,6 +10,7 @@ import environment
 import openfoam
 
 app = Flask(__name__)
+app.secret_key = uuid.uuid4().hex
 
 # JINJA FILTERS
 @app.template_filter('human_time')
@@ -28,15 +30,30 @@ def human_time(s):
         return 'Pending'
     return 'Unknown'
 
+@app.template_filter('human_scheduler_status')
+def human_time(s):
+    s = int(s)
+    if s == 0:
+        return 'Free'
+    elif s == 1:
+        return 'Busy'
+    return 'Unknown'
 
 # EXTRA
+@app.before_request
+def loggedIn():
+    if request.cookies.get('jwt') != environment.AUTH_SECRET and request.endpoint != 'login' and '/api/' not in request.path:
+        return redirect(url_for('login'))
+
 @app.after_request
-def securityHeader(response):
+def securityHeaders(response):
     response.headers.add("Access-Control-Allow-Origin", "http://localhost:5000")
     response.headers.add("Access-Control-Allow-Origin", "http://localhost:11000")
     response.headers.add("Access-Control-Allow-Origin", "https://pno3cwa1.student.cs.kuleuven.be")
-    response.headers.add("Access-Control-Allow-Origin", "https://pno3cwa2.student.cs.kuleuven.be")
-    response.headers.add("Content-Security-Policy", 'default-src \'self\' unpkg.com')
+    response.headers.add("Content-Security-Policy", "default-src \'self\' unpkg.com")
+    response.headers.add("X-Content-Type-Options", "nosniff")
+    response.headers.add("X-Frame-Options", "SAMEORIGIN")
+    response.headers.add("X-XSS-Protection", "1; mode=block")
     return response
 
 @app.errorhandler(404)
@@ -44,18 +61,31 @@ def not_found(e):
     return render_template("404.html")
 
 @app.route('/robots.txt')
-def static_file():
+def robots():
     return app.send_static_file('robots.txt')
 
 @app.route("/")
 def tasks():
     return render_template("tasks.html", title='Tasks', task_data=database.list_task('all'))
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == 'POST':
+        resp = make_response()
+        resp.set_cookie("jwt", value=request.form.get("jwt"), expires=datetime.now()+timedelta(seconds=60))
+        resp.headers['location'] = url_for('tasks') 
+        return resp, 302
+    return render_template("login.html", title='Login')
+
 @app.route("/task/<task_id>")
 def view_task(task_id):
     if database.task_exists(task_id):
         return render_template("view_task.html", title=f'Task info', task_id=task_id, task_data=database.status_task(task_id))
     return render_template("404.html")
+
+@app.route("/schedulers")
+def schedulers():
+    return render_template("schedulers.html", title='Schedulers', schedulers_data=database.list_scheduler())
 
 @app.route("/users")
 def users():
@@ -68,10 +98,6 @@ def view_user(identifier):
     return render_template("404.html")
 
 # TASK ENDPOINTS
-@app.route('/api/task/list')
-def list_task():
-    return jsonify(database.list_task())
-
 @app.route('/api/task/add', methods=["POST"])
 def add_task():
     task_id = str(uuid.uuid4())[:8]
@@ -113,10 +139,6 @@ def status_task(task_id):
     return jsonify({"error": "task does not exist"})
 
 # SCHEDULER ENDPOINTS
-@app.route('/api/scheduler/list')
-def list_scheduler():
-    return jsonify(database.list_scheduler())
-
 @app.route('/api/scheduler/free/<pc>')
 def free_scheduler(pc):
     return jsonify(database.free_scheduler(pc))
@@ -124,10 +146,6 @@ def free_scheduler(pc):
 @app.route('/api/scheduler/busy/<pc>')
 def busy_scheduler(pc):
     return jsonify(database.busy_scheduler(pc))
-
-@app.route('/api/scheduler/status/<pc>')
-def status_scheduler(pc):
-    return jsonify(database.status_scheduler(pc))
 
 # USER ENDPOINTS
 @app.route('/api/user/add', methods=['POST'])
