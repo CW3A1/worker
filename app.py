@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from flask import (Flask, jsonify, make_response, redirect, render_template,
-                   request, url_for)
+from flask import (Flask, Response, jsonify, redirect,
+                   render_template, request, url_for)
 
 import auth
 import database
@@ -48,12 +48,12 @@ def securityHeaders(response):
     return response
 
 @app.errorhandler(404)
-def not_found():
-    return render_template("404.html")
+def not_found(e):
+    return render_template("404.html", title="404")
 
 @app.route('/robots.txt')
 def robots():
-    return app.send_static_file('robots.txt')
+    return Response("User-agent: *\nDisallow: /", mimetype="text/plain")
 
 # DASHBOARD
 @app.route("/")
@@ -87,38 +87,29 @@ def add_task():
     r = request.json
     r = [float(r[x][0]) for x in r] + [float(r[x][1]) for x in r]
     if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        if auth_header[:7] == 'Bearer ':
-            jwt = auth_header[7:]
-            if database.get_row(environment.DB_TABLE_USERS, "jwt_token", jwt):
-                identifier = database.user_info("jwt_token", jwt)["uuid"]
-                resp = database.add_task(task_id, r, identifier)
-                openfoam.next_openfoam_thread()
-                return jsonify(resp)
-            return jsonify({"error": "token does not exist"})
-        return jsonify({"error": "authorization header is malformed"})
+        bearer = request.headers['Authorization']
+        identifier = auth.bearer_to_uuid(bearer)
+        if identifier:
+            resp = database.add_task(task_id, r, identifier)
+            openfoam.next_openfoam_thread()
+            return jsonify(resp)
+        return jsonify({"error": "invalid authorization provided"})
     resp = database.add_task(task_id, r)
     openfoam.next_openfoam_thread()
     return jsonify(resp)
 
 @app.route('/api/task/status/<task_id>')
 def status_task(task_id):
-    if database.get_row(environment.DB_TABLE_TASKS, "task_id", task_id):
-        resp = database.status_task(task_id)
-        if 'Authorization' in request.headers:
-            auth_header = request.headers['Authorization']
-            if auth_header[:7] == 'Bearer ':
-                jwt = auth_header[7:]
-                if database.get_row(environment.DB_TABLE_USERS, "jwt_token", jwt):
-                    identifier = database.user_info("jwt_token", jwt)["uuid"]
-                    if identifier == resp[task_id]['uuid']:
-                        return jsonify(resp)
-                    return jsonify({"error": "token does not match task"})
-                return jsonify({"error": "token does not exist"})
-            return jsonify({"error": "authorization header is malformed"})
-        if resp[task_id]['uuid'] == '':
+    if (task_info := database.get_row(environment.DB_TABLE_TASKS, "task_id", task_id)):
+        resp = {task_info[0]:{'status': task_info[1], 'unix_time': task_info[2], 'pc': task_info[3], 'input_values': task_info[4], 'result': task_info[5], 'uuid': task_info[6]}}
+        if resp[task_id]["uuid"] == '':
             return jsonify(resp)
-        return jsonify({"error": "authorization is required"})
+        if 'Authorization' in request.headers:
+            bearer = request.headers['Authorization']
+            jwt_identifier = auth.bearer_to_uuid(bearer)
+            if jwt_identifier == resp[task_id]["uuid"]:
+                return jsonify(resp)
+        return jsonify({"error": "invalid authorization provided"})
     return jsonify({"error": "task does not exist"})
 
 # SCHEDULER ENDPOINTS
@@ -135,9 +126,6 @@ def busy_scheduler(pc):
 def add_user():
     email, password = request.json["email"], request.json["password"]
     resp = auth.add_user(email, password)
-    if type(resp) == dict:
-        return jsonify(resp)
-    resp = auth.auth_user(email, password)
     return jsonify(resp)
 
 @app.route('/api/user/auth', methods=['POST'])
@@ -149,12 +137,8 @@ def auth_user():
 @app.route('/api/user/tasks')
 def user_tasks():
     if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        if auth_header[:7] == 'Bearer ':
-            jwt = auth_header[7:]
-            if database.get_row(environment.DB_TABLE_USERS, "jwt_token", jwt):
-                identifier = database.user_info("jwt_token", jwt)["identifier"]
-                return jsonify(database.list_task(identifier))
-            return jsonify({"error": "token does not exist"})
-        return jsonify({"error": "authorization header is malformed"})
-    return redirect(url_for('list_task'))
+        bearer = request.headers['Authorization']
+        identifier = auth.bearer_to_uuid(bearer)
+        if identifier:
+            return jsonify(database.list_task(identifier))
+    return jsonify({"error": "invalid authorization provided"})

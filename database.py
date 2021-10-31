@@ -55,14 +55,13 @@ def free_scheduler(pc):
 def busy_scheduler(pc):
     update_row(environment.DB_TABLE_SCHEDULER, "status", 1, "pc", pc)
 
-def update_jwt(old_jwt, new_jwt, new_expiry=time_ns()+15*1e9):
-    update_row(environment.DB_TABLE_USERS, "jwt_token", new_jwt, "jwt_token", old_jwt)
-    update_row(environment.DB_TABLE_USERS, "expiry", new_expiry, "jwt_token", new_jwt)
-
 # STATUS/INFO
 def list_task(identifier = ''):
     connection, cursor = connect_to_db()
-    cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS}{(' WHERE uuid = ' + chr(39) + identifier + chr(39)) if identifier != 'all' else ''};")
+    if identifier == 'all':
+        cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS};")
+    else:
+        cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS} WHERE uuid = '{identifier}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
     return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]} for result in results}
@@ -81,7 +80,7 @@ def status_scheduler(pc):
 
 def user_info(s_column, s_value):
     result = get_row(environment.DB_TABLE_USERS, s_column, s_value)
-    return {'uuid': result[0], 'jwt': result[2], 'expiry': result[3]}
+    return {'uuid': result[0]}
 
 def user_hash(identifier):
     result = get_row(environment.DB_TABLE_USERS, "uuid", identifier)
@@ -95,9 +94,9 @@ def add_task(task_id, input_values, identifier = ''):
     close_connection(connection, cursor)
     return status_task(task_id)
 
-def add_user(identifier, hashed_password, jwt, expiry=time_ns()+15*1e9):
+def add_user(identifier, hashed_password):
     connection, cursor = connect_to_db()
-    cursor.execute(f"INSERT INTO {environment.DB_TABLE_USERS} VALUES ('{identifier}', '{hashed_password}', '{jwt}', {expiry});")
+    cursor.execute(f"INSERT INTO {environment.DB_TABLE_USERS} VALUES ('{identifier}', '{hashed_password}');")
     connection.commit()
     close_connection(connection, cursor)
 

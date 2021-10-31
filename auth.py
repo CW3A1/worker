@@ -1,8 +1,8 @@
 import uuid
-from secrets import token_hex
-from time import time_ns
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
+import jwt
 
 import database
 import environment
@@ -16,30 +16,28 @@ def generate_hash(password):
     hashed_password = bcrypt.hashpw(bytes(password, 'utf-8'), bcrypt.gensalt())
     return hashed_password.decode('utf-8')
 
-def check_password(password, hashed_password):
-    validity = bcrypt.checkpw(bytes(password, 'utf-8'), hashed_password.encode('utf-8'))
-    return validity
+def generate_jwt(identifier):
+    token = str(jwt.encode({"uuid": identifier, "exp": datetime.now(tz=timezone.utc) + timedelta(days=1)}, environment.AUTH_SECRET), "utf-8")
+    return token
+
+def bearer_to_uuid(bearer):
+    try:
+        decoded = jwt.decode(bearer[7:], environment.AUTH_SECRET)
+        return decoded["uuid"]
+    except:
+        return False
 
 def add_user(email, password):
-    if email and password and len(password) < 72:
-        identifier = generate_uuid(email)
-        if not database.get_row(environment.DB_TABLE_USERS, "uuid", identifier):
-            hashed_password, jwt = generate_hash(password), token_hex()
-            database.add_user(identifier, hashed_password, jwt)
-            return True
-        return {"error": "user already exists"}
-    return {"error": "invalid email or password"}
+    identifier = generate_uuid(email)
+    if not database.get_row(environment.DB_TABLE_USERS, "uuid", identifier):
+        database.add_user(identifier, generate_hash(password))
+        return {"uuid": identifier, "jwt": generate_jwt(identifier) }
+    return {"error": "user already exists"}
 
 def auth_user(email, password):
-    if email and password:
-        identifier = generate_uuid(email)
-        if database.get_row(environment.DB_TABLE_USERS, "uuid", identifier):
-            if check_password(password, database.user_hash(identifier)):
-                resp = database.user_info("uuid", identifier)
-                if resp["expiry"] <= time_ns():
-                    database.update_jwt(resp["jwt"], new_token:=token_hex(), new_expiry:=time_ns()+24*60*60*1e9)
-                    resp["jwt"], resp["expiry"] = new_token, int(new_expiry)
-                return resp
-            return {"error": "wrong password"}
-        return {"error": "user does not exist"}
-    return {"error": "invalid email or password"}
+    identifier = generate_uuid(email)
+    if database.get_row(environment.DB_TABLE_USERS, "uuid", identifier):
+        if generate_hash(password) == database.user_hash(identifier):
+            return {"uuid": identifier, "jwt": generate_jwt(identifier) }
+        return {"error": "wrong password"}
+    return {"error": "user does not exist"}
