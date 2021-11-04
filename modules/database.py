@@ -72,6 +72,10 @@ def status_task(task_id):
     result = get_row(environment.DB_TABLE_TASKS, "task_id", task_id)
     return {'id': result[0],'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': orjson.loads(result[4]), 'result': orjson.loads(result[5]) if result[5] else [], 'uuid': result[6]}
 
+def task_exists(task_id):
+    result = get_row(environment.DB_TABLE_TASKS, "task_id", task_id)
+    return True if result else False
+
 def list_scheduler():
     result = get_table(environment.DB_TABLE_SCHEDULER)
     return {r[0]:r[1] for r in result}

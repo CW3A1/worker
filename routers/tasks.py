@@ -31,7 +31,8 @@ async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier
 
 @router.get("/api/task/status/{task_id}", response_model=TaskOutput, tags=["tasks"])
 async def view_task_status(task_id: str, identifier: str = Depends(auth.header_to_identifier)):
-    if (resp := database.status_task(task_id)):
+    if database.task_exists(task_id):
+        resp = database.status_task(task_id)
         if resp["uuid"] in {"", identifier}:
             return resp
         raise HTTPException(status_code=403)
