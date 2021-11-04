@@ -1,7 +1,7 @@
 from os import getenv
 
-DB_FILE = "/home/deterio/podman/database/sqlite.db"
-DB_TABLE_TASKS = "tasks"
-DB_TABLE_SCHEDULER = "task_scheduler"
-DB_TABLE_USERS = "users"
-AUTH_SECRET = "cw3a1"
+DB_FILE = getenv('db_file')
+DB_TABLE_TASKS = getenv('db_table_tasks')
+DB_TABLE_SCHEDULER = getenv('db_table_scheduler')
+DB_TABLE_USERS = getenv('db_table_users')
+AUTH_SECRET = getenv('auth_secret')
