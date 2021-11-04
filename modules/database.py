@@ -1,7 +1,9 @@
 import sqlite3
 from time import time_ns
 
-import environment
+import orjson
+
+from . import environment
 
 
 def connect_to_db(file = environment.DB_FILE):
@@ -64,11 +66,11 @@ def list_task(identifier = ''):
         cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS} WHERE uuid = '{identifier}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
-    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]} for result in results}
+    return {{'id': result[0], 'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': orjson.loads(result[4]), 'result': orjson.loads(result[5]) if result[5] else [], 'uuid': result[6]} for result in results}
 
 def status_task(task_id):
     result = get_row(environment.DB_TABLE_TASKS, "task_id", task_id)
-    return {result[0]:{'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': result[4], 'result': result[5], 'uuid': result[6]}}
+    return {'id': result[0],'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': orjson.loads(result[4]), 'result': orjson.loads(result[5]) if result[5] else [], 'uuid': result[6]}
 
 def list_scheduler():
     result = get_table(environment.DB_TABLE_SCHEDULER)
@@ -76,7 +78,7 @@ def list_scheduler():
 
 def status_scheduler(pc):
     result = get_row(environment.DB_TABLE_SCHEDULER, "pc", pc)
-    return {result[0]:result[1]}
+    return {"pc": result[0], "status": result[1]}
 
 def user_info(s_column, s_value):
     result = get_row(environment.DB_TABLE_USERS, s_column, s_value)
@@ -85,6 +87,10 @@ def user_info(s_column, s_value):
 def user_hash(identifier):
     result = get_row(environment.DB_TABLE_USERS, "uuid", identifier)
     return result[1]
+
+def user_exists(identifier):
+    result = get_row(environment.DB_TABLE_USERS, "uuid", identifier)
+    return True if result else False
 
 # ADD ROWS
 def add_task(task_id, input_values, identifier = ''):

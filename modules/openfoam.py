@@ -3,14 +3,14 @@ import threading
 
 import numpy
 
-import database
+from modules import database
 
 
 def openfoam_thread(data_points, pc, task_id):
     data_pointsx = data_points[:4]
     data_pointsy = data_points[4:]
-    A = numpy.array([[int(x)**3, int(x)**2, int(x)**1, 1] for x in data_pointsx])
-    b = numpy.array([[int(y)] for y in data_pointsy])
+    A = numpy.array([[x**3, x**2, x**1, 1] for x in data_pointsx])
+    b = numpy.array([[y] for y in data_pointsy])
     res = [round(arr[0], 3) for arr in numpy.linalg.solve(A,b).tolist()]
     database.complete_task(task_id, res)
     database.free_scheduler(pc)
@@ -21,5 +21,4 @@ def next_openfoam_thread():
     if randomFreeScheduler and oldestPendingTask:
         database.pending_task(oldestPendingTask, randomFreeScheduler)
         database.busy_scheduler(randomFreeScheduler)
-        of_thread = threading.Thread(target = openfoam_thread, args = (json.loads(database.status_task(oldestPendingTask)[oldestPendingTask]['input_values']), randomFreeScheduler, oldestPendingTask))
-        of_thread.start()
+        openfoam_thread(database.status_task(oldestPendingTask)['input_values'], randomFreeScheduler, oldestPendingTask)
