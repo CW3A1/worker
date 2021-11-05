@@ -21,7 +21,7 @@ class TaskOutput(BaseModel):
     result: List[float] = [0, 0, 0, 0]
     uuid: str = ""
 
-@router.post("/api/task/add", response_model=TaskOutput, tags=["tasks"])
+@router.post("/add", response_model=TaskOutput, tags=["tasks"])
 async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier: str = Depends(auth.header_to_identifier)):
     task_id = str(uuid.uuid4())[:8]
     r = [task_data.p1[0], task_data.p2[0], task_data.p3[0], task_data.p4[0], task_data.p1[1], task_data.p2[1], task_data.p3[1], task_data.p4[1]]
@@ -29,7 +29,7 @@ async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier
     background.add_task(openfoam.next_openfoam_thread)
     return resp
 
-@router.get("/api/task/status/{task_id}", response_model=TaskOutput, tags=["tasks"])
+@router.get("/status/{task_id}", response_model=TaskOutput, tags=["tasks"])
 async def view_task_status(task_id: str, identifier: str = Depends(auth.header_to_identifier)):
     if database.task_exists(task_id):
         resp = database.status_task(task_id)

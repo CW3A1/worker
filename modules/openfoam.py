@@ -1,6 +1,3 @@
-import json
-import threading
-
 import numpy
 
 from modules import database

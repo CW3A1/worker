@@ -8,7 +8,7 @@ class SchedulerInfo(BaseModel):
     pc: str = "brugge"
     status: int = 0
 
-@router.put("/api/scheduler/status", response_model=SchedulerInfo, tags=["schedulers"])
+@router.put("/status", response_model=SchedulerInfo, tags=["schedulers"])
 def change_scheduler_status(new_info: SchedulerInfo, auth: str):
     if auth == environment.AUTH_SECRET:
         if database.scheduler_exists(new_info.pc):
@@ -19,7 +19,7 @@ def change_scheduler_status(new_info: SchedulerInfo, auth: str):
         raise HTTPException(status_code=404)
     raise HTTPException(status_code=401)
 
-@router.get("/api/scheduler/status/{pc}", response_model=SchedulerInfo, tags=["schedulers"])
+@router.get("/status/{pc}", response_model=SchedulerInfo, tags=["schedulers"])
 def view_scheduler_status(pc: str):
     if database.scheduler_exists(pc):
         return database.status_scheduler(pc)

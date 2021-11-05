@@ -17,9 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(schedulers.router)
-app.include_router(tasks.router)
-app.include_router(users.router)
+app.include_router(schedulers.router, prefix='/api/scheduler')
+app.include_router(tasks.router, prefix='/api/task')
+app.include_router(users.router, prefix='/api/user')
 
 @app.get("/")
 def read_root():
