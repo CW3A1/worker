@@ -13,11 +13,11 @@ def generate_uuid(email):
     return str(identifier)
 
 def generate_hash(password):
-    hashed_password = bcrypt.hashpw(bytes(password, 'utf-8'), bcrypt.gensalt())
+    hashed_password = bcrypt.hashpw(bytes(password, "utf-8"), bcrypt.gensalt())
     return hashed_password.decode("utf-8")
 
 def check_password(password, hashed_password):
-    validity = bcrypt.checkpw(bytes(password, 'utf-8'), hashed_password.encode('utf-8'))
+    validity = bcrypt.checkpw(bytes(password, "utf-8"), hashed_password.encode("utf-8"))
     return validity
 
 def generate_jwt(identifier):

@@ -56,9 +56,9 @@ def change_scheduler_status(pc: str, status: int):
     update_row(environment.DB_TABLE_SCHEDULER, "status", status, "pc", pc)
 
 # STATUS/INFO
-def list_task(identifier = ''):
+def list_task(identifier = ""):
     connection, cursor = connect_to_db()
-    if identifier == 'all':
+    if identifier == "all":
         cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS};")
     else:
         cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS} WHERE uuid = '{identifier}';")
@@ -99,7 +99,7 @@ def user_exists(identifier):
     return True if result else False
 
 # ADD ROWS
-def add_task(task_id, input_values, identifier = ''):
+def add_task(task_id, input_values, identifier = ""):
     connection, cursor = connect_to_db()
     cursor.execute(f"INSERT INTO {environment.DB_TABLE_TASKS} (task_id, unix_time, input_values, uuid) VALUES ('{task_id}', {time_ns()}, '{input_values}', '{identifier}');")
     connection.commit()

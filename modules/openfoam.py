@@ -18,4 +18,4 @@ def next_openfoam_thread():
     if randomFreeScheduler and oldestPendingTask:
         database.pending_task(oldestPendingTask, randomFreeScheduler)
         database.change_scheduler_status(randomFreeScheduler, 1)
-        openfoam_thread(database.status_task(oldestPendingTask)['input_values'], randomFreeScheduler, oldestPendingTask)
+        openfoam_thread(database.status_task(oldestPendingTask)["input_values"], randomFreeScheduler, oldestPendingTask)
