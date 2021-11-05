@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import Dict, List
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from modules import auth, database, openfoam
@@ -14,12 +14,16 @@ class TaskInput(BaseModel):
     p4: List[float] = [0, 0]
 
 class TaskOutput(BaseModel):
-    id: str
+    task_id: str
     status: str = 0
-    pc: str = "brugge"
+    pc: str
     input_values: List[float] = [0, 0, 0, 0, 0, 0, 0, 0]
     result: List[float] = [0, 0, 0, 0]
-    uuid: str = ""
+    uuid: str
+
+class TaskList(BaseModel):
+    tasks: List[TaskOutput]
+    uuid: str
 
 @router.post("/add", response_model=TaskOutput, tags=["tasks"])
 async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier: str = Depends(auth.header_to_identifier)):

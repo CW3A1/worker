@@ -5,7 +5,7 @@ from pydantic import BaseModel
 router = APIRouter()
 
 class SchedulerInfo(BaseModel):
-    pc: str = "brugge"
+    pc: str
     status: int = 0
 
 @router.put("/status", response_model=SchedulerInfo, tags=["schedulers"])

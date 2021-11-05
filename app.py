@@ -20,7 +20,3 @@ app.add_middleware(
 app.include_router(schedulers.router, prefix="/api/scheduler")
 app.include_router(tasks.router, prefix="/api/task")
 app.include_router(users.router, prefix="/api/user")
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}

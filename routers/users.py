@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from modules import auth, database
 from pydantic import BaseModel
+from routers import tasks
 
 router = APIRouter()
 
 class User(BaseModel):
     email: str = "example@example.com"
-    password: str = "secure_password"
+    password: str
 
 class UserToken(BaseModel):
     uuid: str
@@ -28,7 +29,7 @@ async def authenticate_user(user: User):
             return UserToken(uuid=identifier, jwt=auth.generate_jwt(identifier))
     raise HTTPException(status_code=401)
 
-@router.get("/tasks", tags=["users"])
+@router.get("/tasks", response_model=tasks.TaskList, tags=["users"])
 async def view_user_tasks(identifier: str = Depends(auth.header_to_identifier)):
     if identifier:
         return database.list_task(identifier)
