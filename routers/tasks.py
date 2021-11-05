@@ -29,7 +29,7 @@ async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier
     background.add_task(openfoam.next_openfoam_thread)
     return database.status_task(task_id)
 
-@router.get("/status/{task_id}", response_model=TaskOutput, tags=["tasks"])
+@router.get("/status", response_model=TaskOutput, tags=["tasks"])
 async def view_task_status(task_id: str, identifier: str = Depends(auth.header_to_identifier)):
     if database.task_exists(task_id):
         resp = database.status_task(task_id)
