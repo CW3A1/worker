@@ -64,7 +64,7 @@ def list_task(identifier = ""):
         cursor.execute(f"SELECT * FROM {environment.DB_TABLE_TASKS} WHERE uuid = '{identifier}';")
     results = cursor.fetchall()
     close_connection(connection, cursor)
-    return {{'id': result[0], 'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': orjson.loads(result[4]), 'result': orjson.loads(result[5]) if result[5] else [], 'uuid': result[6]} for result in results}
+    return {result[0]: {'id': result[0], 'status': result[1], 'unix_time': result[2], 'pc': result[3], 'input_values': orjson.loads(result[4]), 'result': orjson.loads(result[5]) if result[5] else [], 'uuid': result[6]} for result in results}
 
 def status_task(task_id):
     result = get_row(environment.DB_TABLE_TASKS, "task_id", task_id)
