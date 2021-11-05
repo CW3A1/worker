@@ -2,6 +2,7 @@ import sqlite3
 from time import time_ns
 
 import orjson
+from routers import schedulers, tasks, users
 
 from . import environment
 
@@ -51,11 +52,8 @@ def pending_task(task_id, pc):
     update_row(environment.DB_TABLE_TASKS, "status", 2, "task_id", task_id)
     update_row(environment.DB_TABLE_TASKS, "pc", pc, "task_id", task_id)
 
-def free_scheduler(pc):
-    update_row(environment.DB_TABLE_SCHEDULER, "status", 0, "pc", pc)
-
-def busy_scheduler(pc):
-    update_row(environment.DB_TABLE_SCHEDULER, "status", 1, "pc", pc)
+def change_scheduler_status(pc: str, status: int):
+    update_row(environment.DB_TABLE_SCHEDULER, "status", status, "pc", pc)
 
 # STATUS/INFO
 def list_task(identifier = ''):
@@ -82,7 +80,11 @@ def list_scheduler():
 
 def status_scheduler(pc):
     result = get_row(environment.DB_TABLE_SCHEDULER, "pc", pc)
-    return {"pc": result[0], "status": result[1]}
+    return schedulers.SchedulerInfo(pc=result[0], status=result[1])
+
+def scheduler_exists(pc):
+    result = get_row(environment.DB_TABLE_SCHEDULER, "pc", pc)
+    return True if result else False
 
 def user_info(s_column, s_value):
     result = get_row(environment.DB_TABLE_USERS, s_column, s_value)
@@ -102,7 +104,6 @@ def add_task(task_id, input_values, identifier = ''):
     cursor.execute(f"INSERT INTO {environment.DB_TABLE_TASKS} (task_id, unix_time, input_values, uuid) VALUES ('{task_id}', {time_ns()}, '{input_values}', '{identifier}');")
     connection.commit()
     close_connection(connection, cursor)
-    return status_task(task_id)
 
 def add_user(identifier, hashed_password):
     connection, cursor = connect_to_db()

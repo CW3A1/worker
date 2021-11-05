@@ -8,18 +8,18 @@ from pydantic import BaseModel
 router = APIRouter()
 
 class TaskInput(BaseModel):
-    p1: List[float]
-    p2: List[float]
-    p3: List[float]
-    p4: List[float]
+    p1: List[float] = [0, 0]
+    p2: List[float] = [0, 0]
+    p3: List[float] = [0, 0]
+    p4: List[float] = [0, 0]
 
 class TaskOutput(BaseModel):
     id: str
-    status: str
-    pc: str
-    input_values: List[float]
-    result: List[float]
-    uuid: str
+    status: str = 0
+    pc: str = "brugge"
+    input_values: List[float] = [0, 0, 0, 0, 0, 0, 0, 0]
+    result: List[float] = [0, 0, 0, 0]
+    uuid: str = ""
 
 @router.post("/api/task/add", response_model=TaskOutput, tags=["tasks"])
 async def add_task(task_data: TaskInput, background: BackgroundTasks, identifier: str = Depends(auth.header_to_identifier)):
