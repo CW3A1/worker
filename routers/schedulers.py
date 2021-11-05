@@ -19,7 +19,7 @@ def change_scheduler_status(new_info: SchedulerInfo, auth: str):
         raise HTTPException(status_code=404)
     raise HTTPException(status_code=401)
 
-@router.get("/status/{pc}", response_model=SchedulerInfo, tags=["schedulers"])
+@router.get("/status", response_model=SchedulerInfo, tags=["schedulers"])
 def view_scheduler_status(pc: str):
     if database.scheduler_exists(pc):
         return database.status_scheduler(pc)
