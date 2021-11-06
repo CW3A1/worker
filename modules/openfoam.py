@@ -1,14 +1,12 @@
-import numpy
+from numpy import polyfit
 
 from modules import database
 
 
 def openfoam_thread(data_points, pc, task_id):
-    data_pointsx = data_points[:4]
-    data_pointsy = data_points[4:]
-    A = numpy.array([[x**3, x**2, x**1, 1] for x in data_pointsx])
-    b = numpy.array([[y] for y in data_pointsy])
-    res = [round(arr[0], 3) for arr in numpy.linalg.solve(A,b).tolist()]
+    x = data_points[:4]
+    y = data_points[4:]
+    res = [round(num, 3) for num in polyfit(x, y, 3)]
     database.complete_task(task_id, res)
     database.change_scheduler_status(pc, 0)
 
