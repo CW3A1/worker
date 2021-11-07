@@ -3,6 +3,7 @@ from time import sleep
 
 from fastapi import APIRouter, WebSocket
 from fastapi.responses import HTMLResponse
+from modules import environment
 
 router = APIRouter()
 
@@ -16,15 +17,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @router.get("/test")
 async def get():
-    return HTMLResponse("""
+    return HTMLResponse(f"""
                         <body>
                         </body>
                         <script>
-                            var ws = new WebSocket("ws://localhost:11001/ws");
-                            ws.onmessage = function(event) {
+                            var ws = new WebSocket("{environment.WS_URL}");
+                            ws.onmessage = function(event) {{
                                 console.log(event.data)
                                 document.body.innerHTML = event.data
-                            };
+                            }};
                             ws.onopen = () => ws.send("");
                         </script>
                         """)
