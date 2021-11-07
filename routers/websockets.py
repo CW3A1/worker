@@ -1,19 +1,21 @@
-from random import randint
-from time import sleep
+from asyncio import sleep
 
 from fastapi import APIRouter, WebSocket
 from fastapi.responses import HTMLResponse
-from modules import environment
+from modules import database, environment
+from orjson import dumps as jsondumps
 
 router = APIRouter()
 
 @router.websocket("")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    data = await websocket.receive_text()
-    while True:
-        sleep(1)
-        await websocket.send_text(f"randomnumber: {randint(1,10)}")
+    pc = await websocket.receive_text()
+    init_data = database.status_scheduler(pc).dict()
+    await websocket.send_text(jsondumps(init_data).decode("utf-8"))
+    while (act_data:=database.status_scheduler(pc).dict()) == init_data:
+        await sleep(1.5)
+    await websocket.send_text(jsondumps(act_data).decode("utf-8"))
 
 @router.get("/test")
 async def get():
@@ -23,9 +25,13 @@ async def get():
                         <script>
                             var ws = new WebSocket("{environment.WS_URL}");
                             ws.onmessage = function(event) {{
-                                console.log(event.data)
-                                document.body.innerHTML = event.data
+                                console.log(JSON.parse(event.data))
+                                document.body.innerHTML = JSON.parse(event.data)["pc"] + "|" + JSON.parse(event.data)["status"]
                             }};
-                            ws.onopen = () => ws.send("");
+                            ws.onopen = () => ws.send("eeklo");
+                            window.onbeforeunload = function() {{
+                                ws.onclose = function () {{}};
+                                ws.close();
+                            }};
                         </script>
                         """)
