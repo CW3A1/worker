@@ -1,8 +1,11 @@
+from typing import Dict
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from pydantic import BaseModel
 
-from routers import schedulers, tasks, users, websockets
+from modules import differentiate, integrate, optimize
 
 app = FastAPI()
 
@@ -19,7 +22,15 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware)
 
-app.include_router(schedulers.router, prefix="/api/scheduler")
-app.include_router(tasks.router, prefix="/api/task")
-app.include_router(users.router, prefix="/api/user")
-app.include_router(websockets.router, prefix="/ws")
+class TaskInput(BaseModel):
+    operation: str
+    options: Dict
+
+@app.post("/new_task")
+def new_task(task_input: TaskInput):
+    if task_input.operation == "diff":
+        return differentiate.numDiff(task_input.options["f"], task_input.options["a"], task_input.options["order"] if "order" in task_input.options else 1)
+    if task_input.operation == "int":
+        return integrate.numInt(task_input.options["f"], task_input.options["a"], task_input.options["b"])
+    if task_input.operation == "optimize":
+        return optimize.twoDNumOpt(task_input.options["f"], task_input.options["xl"], task_input.options["xu"], task_input.options["yl"], task_input.options["yu"])
