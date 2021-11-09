@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
-from modules import differentiate, integrate, optimize
+from modules import differentiate, integrate, lagrange, optimize, taylor
 
 app = FastAPI()
 
@@ -34,3 +34,7 @@ def new_task(task_input: TaskInput):
         return integrate.numInt(task_input.options["f"], task_input.options["a"], task_input.options["b"])
     if task_input.operation == "optimize":
         return optimize.twoDNumOpt(task_input.options["f"], task_input.options["xl"], task_input.options["xu"], task_input.options["yl"], task_input.options["yu"])
+    if task_input.operation == "lagrangeInterpolation":
+        return lagrange.lagrangePoly(task_input.options["a"], task_input.options["b"])
+    if task_input.operation == "taylorApproximation":
+        return taylor.approximateTaylorPoly(task_input.options["f"], task_input.options["x0"], task_input.options["order"])
