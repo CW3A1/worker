@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 import scipy.special as special
+from numpy import inf as Inf
 from sympy import Poly, init_printing
 from sympy.abc import *
 from sympy.parsing.sympy_parser import parse_expr

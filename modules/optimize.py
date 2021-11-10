@@ -12,9 +12,9 @@ class OptResult(BaseModel):
 
 def twoDNumOpt(f="-(y+47)*sin(sqrt(abs(x/2+y+47)))-x*sin(sqrt(abs(x-y+47)))", x_l=-512, x_u=512, y_l=-512, y_u=512):
     bounds = [(x_l, x_u),(y_l, y_u)]
-    f = evalString(f)
+    f = twoDEvalString(f)
     def fun(z):
         nonlocal f
-        return f(z[0], z[1], z=0)
+        return f(z[0], z[1])
     res = dual_annealing(fun, bounds)
     return OptResult(vector=list(res.x), res=res.fun)
