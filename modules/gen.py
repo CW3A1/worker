@@ -1,9 +1,7 @@
-import math
-
 import numpy
 import scipy.special as special
 from numpy import inf as Inf
-from sympy import Poly, init_printing
+from sympy import N, Poly, init_printing
 from sympy.abc import *
 from sympy.parsing.sympy_parser import (convert_xor,
                                         implicit_multiplication_application,
@@ -12,9 +10,12 @@ from sympy.utilities.lambdify import lambdify
 
 init_printing(use_unicode=True)
 
-def evalString(f: str):
+def evalString(f: str, free_vars: set = set()):
     parse_string = parse_expr(f, transformations=standard_transformations+(convert_xor, implicit_multiplication_application,))
-    f = lambdify(tuple(parse_string.free_symbols), parse_string, "numpy")
+    if len(free_vars) > 0:
+        f = lambdify(tuple(free_vars), parse_string, "numpy")
+    else:
+        f = lambdify(tuple(parse_string.free_symbols), parse_string, "numpy")
     return f
 
 def oneDPolyToStr(f: numpy.poly1d):
