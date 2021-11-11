@@ -13,9 +13,9 @@ init_printing(use_unicode=True)
 def evalString(f: str, free_vars: set = set()):
     parse_string = parse_expr(f, transformations=standard_transformations+(convert_xor, implicit_multiplication_application,))
     if len(free_vars) > 0:
-        f = lambdify(tuple(free_vars), parse_string, "numpy")
+        f = lambdify(sorted(free_vars), parse_string, "numpy")
     else:
-        f = lambdify(tuple(parse_string.free_symbols), parse_string, "numpy")
+        f = lambdify(sorted(parse_string.free_symbols), parse_string, "numpy")
     return f
 
 def oneDPolyToStr(f: numpy.poly1d):
