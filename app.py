@@ -10,9 +10,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://pno3cwa1.student.cs.kuleuven.be",
-        "http://localhost:5000",
-        "http://localhost:11000",
+        "https://pno3cwa2.student.cs.kuleuven.be",
+        "http://localhost:11001",
     ],
     allow_credentials=True,
     allow_methods=["*"],
