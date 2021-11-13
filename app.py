@@ -9,17 +9,13 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://pno3cwa2.student.cs.kuleuven.be",
-        "http://localhost:11001",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 app.add_middleware(GZipMiddleware)
 
-@app.post("/num_math/differentation")
+@app.post("/num_math/differentiation")
 def new_task(task_input: classes.DiffInput):
     return differentiate.numDiff(task_input.options.f, task_input.options.a, task_input.options.order)
 
