@@ -16,6 +16,6 @@ def twoDNumOpt(f="-(y+47)*sin(sqrt(abs(x/2+y+47)))-x*sin(sqrt(abs(x-y+47)))", x_
     f = evalString(f, free_vars={x, y})
     def fun(z):
         nonlocal f
-        return f(*z)
+        return f(z[0], z[1])
     res = dual_annealing(fun, bounds)
-    return OptResult(vector=list(res.x), res=res.fun)
+    return OptResult(vector=list(res.x) + [res.fun])

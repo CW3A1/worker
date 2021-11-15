@@ -8,4 +8,4 @@ from modules.gen import *
 def lagrangePoly(a: List[float], b: List[float]):
     poly_lagrange = lagrange(numpy.array(a), numpy.array(b))
     poly_lagrange_string = oneDPolyToStr(poly_lagrange)
-    return poly_lagrange_string
+    return {"result": poly_lagrange_string}
