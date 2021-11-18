@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from modules import (classes, differentiate, gen, integrate, lagrange,
-                     optimize, taylor)
+from modules import (classes, differentiate, gen, heat_equation, integrate,
+                     lagrange, optimize, taylor)
 
 app = FastAPI()
 
@@ -35,3 +35,6 @@ def new_task(task_input: classes.LagrangeInput):
 def new_task(task_input: classes.TaylorInput):
     return taylor.approximateTaylorPoly(task_input.options.f, task_input.options.x0, task_input.options.order)
 
+@app.post("/num_math/heat_equation")
+def new_task(task_input: classes.HeatInput):
+    return heat_equation.heatEquation(task_input.options)

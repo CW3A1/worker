@@ -30,6 +30,15 @@ class TaylorOptions(BaseModel):
     x0: float = 0
     order: int = 1
 
+class HeatOptions(BaseModel):
+    L_X: float = 5
+    L_Y: float = 5
+    H: float = 0.3
+    ALPHA: float = 10**6
+    T: float = 5
+    FPS: int = 15
+    BOUNDARY_CONDITION: str = "NO_FLUX"
+
 # INPUT
 class DiffInput(BaseModel):
     operation: str = "unused"
@@ -50,3 +59,7 @@ class LagrangeInput(BaseModel):
 class TaylorInput(BaseModel):
     operation: str = "unused"
     options: TaylorOptions
+
+class HeatInput(BaseModel):
+    operation: str = "unused"
+    options: HeatOptions
