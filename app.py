@@ -16,25 +16,25 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware)
 
 @app.post("/num_math/differentiation")
-def new_task(task_input: classes.DiffInput):
-    return differentiate.numDiff(task_input.options.f, task_input.options.a, task_input.options.order)
+def new_task(task_input: classes.DiffOptions):
+    return differentiate.numDiff(task_input.f, task_input.a, task_input.order)
 
 @app.post("/num_math/integration")
-def new_task(task_input: classes.IntInput):
-    return integrate.numInt(task_input.options.f, gen.Inf if task_input.options.a=="Inf" else (-gen.Inf if task_input.options.a=="-Inf" else task_input.options.a), gen.Inf if task_input.options.b=="Inf" else (-gen.Inf if task_input.options.b=="-Inf" else task_input.options.b))
+def new_task(task_input: classes.IntOptions):
+    return integrate.numInt(task_input.f, gen.Inf if task_input.a=="Inf" else (-gen.Inf if task_input.a=="-Inf" else task_input.a), gen.Inf if task_input.b=="Inf" else (-gen.Inf if task_input.b=="-Inf" else task_input.b))
 
 @app.post("/num_math/optimization")
-def new_task(task_input: classes.OptimInput):
-    return optimize.twoDNumOpt(task_input.options.f, task_input.options.xl, task_input.options.xu, task_input.options.yl, task_input.options.yu)
+def new_task(task_input: classes.OptimOptions):
+    return optimize.twoDNumOpt(task_input.f, task_input.xl, task_input.xu, task_input.yl, task_input.yu)
 
 @app.post("/num_math/lagrange_interpolation")
-def new_task(task_input: classes.LagrangeInput):
-    return lagrange.lagrangePoly(task_input.options.a, task_input.options.b)
+def new_task(task_input: classes.LagrangeOptions):
+    return lagrange.lagrangePoly(task_input.a, task_input.b)
 
 @app.post("/num_math/taylor_approximation")
-def new_task(task_input: classes.TaylorInput):
-    return taylor.approximateTaylorPoly(task_input.options.f, task_input.options.x0, task_input.options.order)
+def new_task(task_input: classes.TaylorOptions):
+    return taylor.approximateTaylorPoly(task_input.f, task_input.x0, task_input.order)
 
 @app.post("/num_math/heat_equation")
-def new_task(task_input: classes.HeatInput):
-    return heat_equation.calcAnimUp(task_input.options)
+def new_task(task_input: classes.HeatOptions):
+    return heat_equation.calcAnimUp(task_input)

@@ -38,28 +38,3 @@ class HeatOptions(BaseModel):
     T: float = 5
     FPS: int = 15
     BOUNDARY_CONDITION: str = "NO_FLUX"
-
-# INPUT
-class DiffInput(BaseModel):
-    operation: str = "diff"
-    options: DiffOptions
-
-class IntInput(BaseModel):
-    operation: str = "int"
-    options: IntOptions
-
-class OptimInput(BaseModel):
-    operation: str = "opt"
-    options: OptimOptions
-
-class LagrangeInput(BaseModel):
-    operation: str = "lint"
-    options: LagrangeOptions
-
-class TaylorInput(BaseModel):
-    operation: str = "taprox"
-    options: TaylorOptions
-
-class HeatInput(BaseModel):
-    operation: str = "heateq"
-    options: HeatOptions
