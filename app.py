@@ -37,4 +37,4 @@ def new_task(task_input: classes.TaylorInput):
 
 @app.post("/num_math/heat_equation")
 def new_task(task_input: classes.HeatInput):
-    return heat_equation.heatEquation(task_input.options)
+    return heat_equation.calcAnimUp(task_input.options)
