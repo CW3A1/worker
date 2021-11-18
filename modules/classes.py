@@ -41,25 +41,25 @@ class HeatOptions(BaseModel):
 
 # INPUT
 class DiffInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "diff"
     options: DiffOptions
 
 class IntInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "int"
     options: IntOptions
 
 class OptimInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "opt"
     options: OptimOptions
 
 class LagrangeInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "lint"
     options: LagrangeOptions
 
 class TaylorInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "taprox"
     options: TaylorOptions
 
 class HeatInput(BaseModel):
-    operation: str = "unused"
+    operation: str = "heateq"
     options: HeatOptions
