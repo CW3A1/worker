@@ -65,8 +65,11 @@ def uploadToUguu(filename):
 
 def calcAnimUp(heat_options: HeatOptions):
     try:
+        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "calculating"})
         (xv, yv, u) = heatEquation(heat_options)
+        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "animating"})
         filename = animateHeat(xv, yv, u, heat_options)
+        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "uploading"})
         link = uploadToUguu(filename)
         return link
     except:
