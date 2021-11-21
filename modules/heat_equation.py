@@ -9,6 +9,7 @@ from requests import post
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from modules.classes import HeatOptions
+from modules.complete_task import postResp
 
 
 def heatEquation(heat_options: HeatOptions):
@@ -63,14 +64,12 @@ def uploadToUguu(filename):
     remove(filename)
     return r
 
-def calcAnimUp(heat_options: HeatOptions):
+def calcAnimUp(task_id: str, heat_options: HeatOptions):
     try:
-        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "calculating"})
         (xv, yv, u) = heatEquation(heat_options)
-        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "animating"})
         filename = animateHeat(xv, yv, u, heat_options)
-        post("https://webhook.site/e207b608-ae8e-4b25-b694-616013ba82c4", data={"operation": "uploading"})
         link = uploadToUguu(filename)
-        return link
     except:
-        return {"link": "error"}
+        link = {"link": "error"}
+    finally:
+        postResp(task_id, link)

@@ -1,9 +1,11 @@
 from scipy.integrate import quad
 
+from modules.complete_task import postResp
 from modules.gen import *
 
 
-def numInt(f: str, a: float, b: float):
+def numInt(task_id: str, f: str, a: float, b: float):
     f = evalString(f)
     result = quad(f, a, b)
-    return {"result": result[0], "error": result[1]}
+    result = {"result": result[0], "error": result[1]}
+    postResp(task_id, result)

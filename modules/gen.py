@@ -1,7 +1,5 @@
 import numpy
-import scipy.special as special
-from numpy import inf as Inf
-from sympy import N, Poly, init_printing
+from sympy import Poly, init_printing
 from sympy.abc import *
 from sympy.parsing.sympy_parser import (convert_xor,
                                         implicit_multiplication_application,
