@@ -1,10 +1,13 @@
 import numpy
+from requests import post
 from sympy import Poly, init_printing
 from sympy.abc import *
 from sympy.parsing.sympy_parser import (convert_xor,
                                         implicit_multiplication_application,
                                         parse_expr, standard_transformations)
 from sympy.utilities.lambdify import lambdify
+
+from modules.environment import DB_URL
 
 init_printing(use_unicode=True)
 
@@ -18,3 +21,6 @@ def evalString(f: str, free_vars: set = set()):
 
 def oneDPolyToStr(f: numpy.poly1d):
     return str(Poly([round(num, 5) for num in f.coef], x).as_expr())
+
+def postResp(task_id: str, res):
+    post(DB_URL+"api/task/complete", json={"task_id": task_id, "data": res})

@@ -9,7 +9,7 @@ from requests import post
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from modules.classes import HeatOptions
-from modules.complete_task import postResp
+from modules.gen import postResp
 
 
 def heatEquation(heat_options: HeatOptions):
@@ -64,7 +64,7 @@ def uploadToUguu(filename):
     remove(filename)
     return r
 
-def calcAnimUp(task_id: str, heat_options: HeatOptions):
+async def calcAnimUp(task_id: str, heat_options: HeatOptions):
     try:
         (xv, yv, u) = heatEquation(heat_options)
         filename = animateHeat(xv, yv, u, heat_options)
