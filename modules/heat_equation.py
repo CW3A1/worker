@@ -64,7 +64,7 @@ def uploadToUguu(filename):
     remove(filename)
     return r
 
-async def calcAnimUp(task_id: str, heat_options: HeatOptions):
+def calcAnimUp(task_id: str, heat_options: HeatOptions):
     try:
         (xv, yv, u) = heatEquation(heat_options)
         filename = animateHeat(xv, yv, u, heat_options)
