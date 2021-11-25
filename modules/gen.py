@@ -1,5 +1,11 @@
+from os import remove
+from time import time
+from typing import List
+
+import matplotlib.pyplot as plt
 import numpy
 from requests import post
+from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 from sympy import Poly, init_printing
 from sympy.abc import *
 from sympy.parsing.sympy_parser import (convert_xor,
@@ -24,3 +30,15 @@ def oneDPolyToStr(f: numpy.poly1d):
 
 def postResp(task_id: str, res):
     post(DB_URL+"api/task/complete", json={"task_id": task_id, "data": res})
+
+def uploadToUguu(filename):
+    file_host_url = "https://uguu.se/api.php?d=upload-tool"
+    file = open(filename, "rb")
+    data = {'file': (file.name, file, "image/gif")}
+    encoder = MultipartEncoder(fields=data)
+    monitor = MultipartEncoderMonitor(encoder)
+    r = post(file_host_url, data=monitor, headers={'Content-Type': monitor.content_type})
+    r = {"link": r.text}
+    file.close()
+    remove(filename)
+    return r
