@@ -7,7 +7,7 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
 from modules.classes import HeatOptions
-from modules.gen import postResp, uploadToUguu
+from modules.gen import postToDB, uploadToUguu
 
 
 def heatEquation(heat_options: HeatOptions):
@@ -58,4 +58,4 @@ def calcAnimUp(task_id: str, heat_options: HeatOptions):
     except:
         link = {"link": "error"}
     finally:
-        postResp(task_id, link)
+        postToDB(task_id, link)

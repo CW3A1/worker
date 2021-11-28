@@ -1,8 +1,5 @@
 from os import remove
-from time import time
-from typing import List
 
-import matplotlib.pyplot as plt
 import numpy
 from requests import post
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
@@ -20,15 +17,15 @@ init_printing(use_unicode=True)
 def evalString(f: str, free_vars: set = set()):
     parse_string = parse_expr(f, transformations=standard_transformations+(convert_xor, implicit_multiplication_application,))
     if len(free_vars) > 0:
-        f = lambdify(free_vars, parse_string, "numpy")
+        f = lambdify(list(free_vars), parse_string, "numpy")
     else:
-        f = lambdify(parse_string.free_symbols, parse_string, "numpy")
+        f = lambdify(list(parse_string.free_symbols), parse_string, "numpy")
     return f
 
 def oneDPolyToStr(f: numpy.poly1d):
     return str(Poly([round(num, 5) for num in f.coef], x).as_expr())
 
-def postResp(task_id: str, res):
+def postToDB(task_id: str, res):
     post(DB_URL+"api/task/complete", json={"task_id": task_id, "data": res})
 
 def uploadToUguu(filename):
