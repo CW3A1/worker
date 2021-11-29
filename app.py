@@ -17,7 +17,7 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware)
 
 try:
-    pool = Pool(processes=4)
+    pool = Pool(processes=6)
     set_start_method('spawn')
 except RuntimeError:
     pass
