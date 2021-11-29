@@ -14,16 +14,15 @@ def heatEquation(heat_options: HeatOptions):
     L_X = heat_options.L_X # X-length of plate
     L_Y = heat_options.L_Y # Y-length of plate
     DX = DY = H = heat_options.H # Step size
-    ALPHA = heat_options.ALPHA # Thermal diffusivity in mm2/s
     T = heat_options.T # Total time in seconds
     BOUNDARY_CONDITION = heat_options.BOUNDARY_CONDITION # see line 31 to 36 for more info 
-    DT = 0.5/(ALPHA*(10**(-6))/DX**2+1/DY**2) # Von Neumann stability condition
+    DT = 0.5/(DX**2+1/DY**2) # Von Neumann stability condition
     T_L = int(np.floor(T/DT)) # Amount of discrete time intervals
     yv, xv = np.mgrid[0:L_X:DX, 0:L_Y:DY] # Create meshgrid
     u = np.zeros((T_L, len(xv), len(xv[0]))) # Construct multidimensional array to store meshgrid data over time
     u[0] = np.exp(-yv)+xv # Set initial condition
     for l in range(1, T_L): # Calculate meshgrid data over time progressively
-        u[l] = u[l-1] + (np.roll(u[l-1], -1, 0) + np.roll(u[l-1], 1, 0) + np.roll(u[l-1], -1, 1) + np.roll(u[l-1], 1, 1) - 4*u[l-1])*ALPHA*(10**(-6))*DT/H**2 # forward Euler method
+        u[l] = u[l-1] + (np.roll(u[l-1], -1, 0) + np.roll(u[l-1], 1, 0) + np.roll(u[l-1], -1, 1) + np.roll(u[l-1], 1, 1) - 4*u[l-1])*(10**(-6))*DT/H**2 # forward Euler method
         if BOUNDARY_CONDITION == "NO_FLUX":
             u[l][0], u[l][-1] = (4*u[l][1]-u[l][2])/3, (4*u[l][-2]-u[l][-3])/3 # du(x, 0, t)/dx = 0 and du(x, L_Y, t)/dx = 0
             u[l][:, 0], u[l][:, -1] = (4*u[l][:, 1]-u[l][:, 2])/3, (4*u[l][:, -2]-u[l][:, -3])/3 # du(0, y, t)/dx = 0 and du(L_X, y, t)/dx = 0
