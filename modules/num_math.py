@@ -80,7 +80,7 @@ def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
     finally:
         postToDB(task_id, result)
 
-def plotIntegral(f: function, a: float, b: float):
+def plotIntegral(f, a: float, b: float):
     x_begin = a - (b-a)*0.2
     x_eind = b + (b-a)*0.2
     dx_lang = numpy.linspace(start=x_begin, stop= x_eind, num = 51)
