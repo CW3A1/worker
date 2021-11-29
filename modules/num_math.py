@@ -13,41 +13,62 @@ from modules.gen import *
 
 
 def numDiff(task_id: str, f: str, a: float, o: int = 1):
-    f = evalString(f)
-    result = derivative(f, a, n=o, order=max(o+1+(o)%2, 7))
-    result = {"result": result}
-    postToDB(task_id, result)
+    try:
+        f = evalString(f)
+        result = derivative(f, a, n=o, order=max(o+1+(o)%2, 7))
+        result = {"result": result}
+    except:
+        result = {"result": "error"}
+    finally:
+        postToDB(task_id, result)
 
 def numInt(task_id: str, f: str, a: float, b: float):
-    f = evalString(f)
-    result = quad(f, a, b)
-    result = {"result": result[0], "err": result[1]}
-    postToDB(task_id, result)
+    try:
+        f = evalString(f)
+        result = quad(f, a, b)
+        result = {"result": result[0], "err": result[1]}
+    except:
+        result = {"result": "error"}
+    finally:
+        postToDB(task_id, result)
 
 def twoDNumOpt(task_id: str, f: str, x_l=-512, x_u=512, y_l=-512, y_u=512):
-    bounds = [(x_l, x_u),(y_l, y_u)]
-    f = evalString(f, free_vars={x, y})
-    def fun(z):
-        nonlocal f
-        return f(z[0], z[1])
-    res = dual_annealing(fun, bounds)
-    resp = {"vector": list(res.x) + [res.fun]}
-    postToDB(task_id, resp)
+    try:
+        bounds = [(x_l, x_u),(y_l, y_u)]
+        f = evalString(f, free_vars={x, y})
+        def fun(z):
+            nonlocal f
+            return f(z[0], z[1])
+        res = dual_annealing(fun, bounds)
+        result = {"vector": list(res.x) + [res.fun]}
+    except:
+        result = {"result": "error"}
+    finally:
+        postToDB(task_id, result)
+
 
 def lagrangePoly(task_id: str, a: List[float], b: List[float]):
-    poly_lagrange = lagrange(array(a), array(b))
-    poly_lagrange_string = oneDPolyToStr(poly_lagrange)
-    link = plotLagrange(poly_lagrange_string, a, b)
-    resp = {"result": poly_lagrange_string, "link": link}
-    postToDB(task_id, resp)
+    try:
+        poly_lagrange = lagrange(array(a), array(b))
+        poly_lagrange_string = oneDPolyToStr(poly_lagrange)
+        link = plotLagrange(poly_lagrange_string, a, b)
+        result = {"result": poly_lagrange_string, "link": link}
+    except:
+        result = {"result": "error", "link": "error"}
+    finally:
+        postToDB(task_id, result)
 
 def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
-    poly = evalString(f)
-    poly_taylor = approximate_taylor_polynomial(poly, x0, degree, 1, order=max(degree+2, 7))
-    poly_taylor_string = oneDPolyToStr(poly_taylor)
-    link = plotTaylor(f, poly_taylor_string, x0)
-    resp = {"result": poly_taylor_string, "link": link}
-    postToDB(task_id, resp)
+    try:
+        poly = evalString(f)
+        poly_taylor = approximate_taylor_polynomial(poly, x0, degree, 1, order=max(degree+2, 7))
+        poly_taylor_string = oneDPolyToStr(poly_taylor)
+        link = plotTaylor(f, poly_taylor_string, x0)
+        result = {"result": poly_taylor_string, "link": link}
+    except:
+        result = {"result": "error", "link": "error"}
+    finally:
+        postToDB(task_id, result)
 
 def plotLagrange(f: str, a: List[float], b: List[float]):
     fun = evalString(f)
