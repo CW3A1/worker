@@ -54,7 +54,8 @@ def calcAnimUp(task_id: str, heat_options: HeatOptions):
         (xv, yv, u) = heatEquation(heat_options)
         filename = animateHeat(xv, yv, u, heat_options)
         link = uploadToUguu(filename)
+        response = {"link": link}
     except:
-        link = {"link": "error"}
+        response = {"link": "error"}
     finally:
-        postToDB(task_id, link)
+        postToDB(task_id, response)

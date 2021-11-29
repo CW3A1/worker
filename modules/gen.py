@@ -35,7 +35,7 @@ def uploadToUguu(filename):
     encoder = MultipartEncoder(fields=data)
     monitor = MultipartEncoderMonitor(encoder)
     r = post(file_host_url, data=monitor, headers={'Content-Type': monitor.content_type})
-    r = {"link": r.text}
+    r = r.text
     file.close()
     remove(filename)
     return r
