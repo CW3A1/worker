@@ -16,7 +16,7 @@ def heatEquation(heat_options: HeatOptions):
     DX = DY = H = heat_options.H # Step size
     T = heat_options.T # Total time in seconds
     BOUNDARY_CONDITION = heat_options.BOUNDARY_CONDITION # see line 31 to 36 for more info 
-    DT = 0.5/(DX**2+1/DY**2) # Von Neumann stability condition
+    DT = 0.5/(1/DX**2+1/DY**2) # Von Neumann stability condition
     T_L = int(np.floor(T/DT)) # Amount of discrete time intervals
     yv, xv = np.mgrid[0:L_X:DX, 0:L_Y:DY] # Create meshgrid
     u = np.zeros((T_L, len(xv), len(xv[0]))) # Construct multidimensional array to store meshgrid data over time
