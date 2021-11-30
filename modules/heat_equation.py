@@ -22,7 +22,7 @@ def heatEquation(heat_options: HeatOptions):
     u = np.zeros((T_L, len(xv), len(xv[0]))) # Construct multidimensional array to store meshgrid data over time
     u[0] = np.exp(-yv)+xv # Set initial condition
     for l in range(1, T_L): # Calculate meshgrid data over time progressively
-        u[l] = u[l-1] + (np.roll(u[l-1], -1, 0) + np.roll(u[l-1], 1, 0) + np.roll(u[l-1], -1, 1) + np.roll(u[l-1], 1, 1) - 4*u[l-1])*(10**(-6))*DT/H**2 # forward Euler method
+        u[l] = u[l-1] + (np.roll(u[l-1], -1, 0) + np.roll(u[l-1], 1, 0) + np.roll(u[l-1], -1, 1) + np.roll(u[l-1], 1, 1) - 4*u[l-1])*DT/H**2 # forward Euler method
         if BOUNDARY_CONDITION == "NO_FLUX":
             u[l][0], u[l][-1] = (4*u[l][1]-u[l][2])/3, (4*u[l][-2]-u[l][-3])/3 # du(x, 0, t)/dx = 0 and du(x, L_Y, t)/dx = 0
             u[l][:, 0], u[l][:, -1] = (4*u[l][:, 1]-u[l][:, 2])/3, (4*u[l][:, -2]-u[l][:, -3])/3 # du(0, y, t)/dx = 0 and du(L_X, y, t)/dx = 0
