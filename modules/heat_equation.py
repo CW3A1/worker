@@ -7,7 +7,7 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
 from modules.classes import HeatOptions
-from modules.gen import postToDB, uploadToUguu
+from modules.gen import add_log, postToDB, uploadToUguu
 
 
 def heatEquation(heat_options: HeatOptions):
@@ -52,10 +52,16 @@ def animateHeat(xv, yv, u, heat_options: HeatOptions):
 def calcAnimUp(task_id: str, heat_options: HeatOptions):
     try:
         (xv, yv, u) = heatEquation(heat_options)
-        filename = animateHeat(xv, yv, u, heat_options)
-        link = uploadToUguu(filename)
-        response = {"link": link}
+        add_log(f"Calculated heat equation data for task {task_id}")
+        try:
+            filename = animateHeat(xv, yv, u, heat_options)
+            link = uploadToUguu(filename)
+            response = {"link": link}
+            add_log(f"Generated plot for for task {task_id}")
+        except:
+            response = {"link": "error"}
+            add_log(f"Failed to generate plot for task {task_id}")
     except:
-        response = {"link": "error"}
+        add_log(f"Failed to calculate heat equation data for task {task_id}")
     finally:
         postToDB(task_id, response)

@@ -17,8 +17,10 @@ def numDiff(task_id: str, f: str, a: float, o: int = 1):
         f = evalString(f)
         result = derivative(f, a, n=o, order=max(o+1+(o)%2, 7))
         result = {"result": result}
+        add_log(f"Calculated derivative for task {task_id}")
     except:
         result = {"result": "error"}
+        add_log(f"Failed to calculate derivative for task {task_id}")
     finally:
         postToDB(task_id, result)
 
@@ -26,13 +28,17 @@ def numInt(task_id: str, f: str, a: float, b: float):
     try:
         f = evalString(f)
         result = quad(f, a, b)
+        add_log(f"Calculated integral for task {task_id}")
         try:
             link = plotIntegral(f, a, b)
+            add_log(f"Generated plot for task {task_id}")
         except:
             link = "error"
+            add_log(f"Failed to generate plot for task {task_id}")
         result = {"result": result[0], "err": result[1], "link": link}
     except:
         result = {"result": "error", "err": "error", "link": "error"}
+        add_log(f"Failed to calculate integral for task {task_id}")
     finally:
         postToDB(task_id, result)
 
@@ -45,8 +51,10 @@ def twoDNumOpt(task_id: str, f: str, x_l=-512, x_u=512, y_l=-512, y_u=512):
             return f(z[0], z[1])
         res = dual_annealing(fun, bounds)
         result = {"vector": list(res.x) + [res.fun]}
+        add_log(f"Calculated global minimum for task {task_id}")
     except:
         result = {"result": "error"}
+        add_log(f"Failed to calculate global minimum for task {task_id}")
     finally:
         postToDB(task_id, result)
 
@@ -55,13 +63,17 @@ def lagrangePoly(task_id: str, a: List[float], b: List[float]):
     try:
         poly_lagrange = lagrange(array(a), array(b))
         poly_lagrange_string = oneDPolyToStr(poly_lagrange)
+        add_log(f"Calculated Lagrange polynomial for task {task_id}")
         try:
             link = plotLagrange(poly_lagrange_string, a, b)
+            add_log(f"Generated plot for for task {task_id}")
         except:
             link = "error"
+            add_log(f"Failed to generate plot for task {task_id}")
         result = {"result": poly_lagrange_string, "link": link}
     except:
         result = {"result": "error", "link": "error"}
+        add_log(f"Failed to calculate Lagrange polynomial for task {task_id}")
     finally:
         postToDB(task_id, result)
 
@@ -70,13 +82,17 @@ def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
         poly = evalString(f)
         poly_taylor = approximate_taylor_polynomial(poly, x0, degree, 1, order=max(degree+2, 7))
         poly_taylor_string = oneDPolyToStr(poly_taylor)
+        add_log(f"Calculated Taylor approximation for task {task_id}")
         try:
             link = plotTaylor(f, poly_taylor_string, x0)
+            add_log(f"Generated plot for for task {task_id}")
         except:
             link = "error"
+            add_log(f"Failed to generate plot for task {task_id}")
         result = {"result": poly_taylor_string, "link": link}
     except:
         result = {"result": "error", "link": "error"}
+        add_log(f"Failed to calculate Taylor approximation for task {task_id}")
     finally:
         postToDB(task_id, result)
 

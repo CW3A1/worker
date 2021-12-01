@@ -1,4 +1,5 @@
 from os import remove
+from time import time_ns
 
 import numpy
 from requests import post
@@ -26,7 +27,7 @@ def oneDPolyToStr(f: numpy.poly1d):
     return str(Poly([round(num, 5) for num in f.coef], x).as_expr())
 
 def postToDB(task_id: str, res):
-    post(DB_URL+"api/task/complete", json={"task_id": task_id, "data": res})
+    post(f"{DB_URL}/api/task/complete", json={"task_id": task_id, "data": res})
 
 def uploadToUguu(filename):
     file_host_url = "https://uguu.se/api.php?d=upload-tool"
@@ -39,3 +40,6 @@ def uploadToUguu(filename):
     file.close()
     remove(filename)
     return r
+
+def add_log(text):
+    post(f"{DB_URL}/api/logs/add", json={"unix_time": time_ns(), "text": text})
