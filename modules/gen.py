@@ -47,6 +47,3 @@ def uploadToUguu(filename):
 
 def add_log(text):
     post(f"{DB_URL}/api/logs/add", json={"unix_time": time_ns(), "text": text})
-
-y = lambda x: x**2
-y(3)
