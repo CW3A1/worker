@@ -1,6 +1,9 @@
+# syntax=docker/dockerfile:1
 FROM python:3.8-slim-buster
 WORKDIR /app
-COPY requirements.txt .
+# SETUP PYTHON ENV
+COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "11002", "--no-access-log", "--http", "httptools", "--ws", "none"]
+# RUN FLASK
+CMD ["gunicorn", "-w", "4", "-b", "127.0.0.1:11002", "app:app"]
