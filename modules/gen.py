@@ -15,8 +15,12 @@ from modules.environment import DB_URL
 
 init_printing(use_unicode=True)
 
-def evalString(f: str, free_vars: set = set()):
+def parseString(f: str):
     parse_string = parse_expr(f, transformations=standard_transformations+(convert_xor, implicit_multiplication_application,))
+    return parse_string
+
+def evalString(f: str, free_vars: set = set()):
+    parse_string = parseString(f)
     if len(free_vars) > 0:
         f = lambdify(list(free_vars), parse_string, "numpy")
     else:
@@ -43,3 +47,6 @@ def uploadToUguu(filename):
 
 def add_log(text):
     post(f"{DB_URL}/api/logs/add", json={"unix_time": time_ns(), "text": text})
+
+y = lambda x: x**2
+y(3)
