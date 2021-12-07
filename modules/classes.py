@@ -45,16 +45,20 @@ class HeatOptions(BaseModel):
     BOUNDARY_CONDITION: str = "NO_FLUX"
 
 class SymDiffOptions(BaseModel):
+    task_id: str = ""
     f: str = "sin(x)"
     o: int = 1
 
 class SymIntOptions(BaseModel):
+    task_id: str = ""
     f: str = "sin(x)"
 
 class SymLimitOptions(BaseModel):
+    task_id: str = ""
     f: str = "sin(x)/x"
     x0: float = 0
     dir: int = 0
 
 class SymSolverOptions(BaseModel):
+    task_id: str = ""
     f: str = "sin(x)"
