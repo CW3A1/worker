@@ -1,83 +1,77 @@
 from multiprocessing import Pool, set_start_method
 
-from flask import Flask
-from flask_pydantic import validate
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from modules import classes, heat_equation, num_math
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.after_request
-def after_request(response):
-    header = response.headers
-    header["Access-Control-Allow-Origin"] = "*"
-    return response
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.add_middleware(GZipMiddleware)
 
 try:
-    pool = Pool(processes=4)
+    pool = Pool(processes=6)
     set_start_method('spawn')
 except RuntimeError:
     pass
 
-@app.route("/num_math/differentiation", methods=["POST"])
-@validate()
-def numDiff_(body: classes.DiffOptions):
-    res = pool.apply_async(num_math.numDiff, (body.task_id, body.f, body.a, body.order))
+@app.post("/num_math/differentiation")
+async def numDiff_(task_input: classes.DiffOptions):
+    res = pool.apply_async(num_math.numDiff, (task_input.task_id, task_input.f, task_input.a, task_input.order))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
+    return {"response": "OK"}
 
-@app.route("/num_math/integration", methods=["POST"])
-@validate()
-async def numInt_(body: classes.IntOptions):
-    res = pool.apply_async(num_math.numInt, (body.task_id, body.f, body.a, body.b))
+@app.post("/num_math/integration")
+async def numInt_(task_input: classes.IntOptions):
+    res = pool.apply_async(num_math.numInt, (task_input.task_id, task_input.f, task_input.a, task_input.b))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
+    return {"response": "OK"}
 
-@app.route("/num_math/optimization", methods=["POST"])
-@validate()
-async def twoDNumOpt_(body: classes.OptimOptions):
-    res = pool.apply_async(num_math.twoDNumOpt, (body.task_id, body.f, body.xl, body.xu, body.yl, body.yu))
+@app.post("/num_math/optimization")
+async def twoDNumOpt_(task_input: classes.OptimOptions):
+    res = pool.apply_async(num_math.twoDNumOpt, (task_input.task_id, task_input.f, task_input.xl, task_input.xu, task_input.yl, task_input.yu))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
+    return {"response": "OK"}
 
-@app.route("/num_math/lagrange_interpolation", methods=["POST"])
-@validate()
-async def lagrangePoly_(body: classes.LagrangeOptions):
-    res = pool.apply_async(num_math.lagrangePoly, (body.task_id, body.a, body.b))
+@app.post("/num_math/lagrange_interpolation")
+async def lagrangePoly_(task_input: classes.LagrangeOptions):
+    res = pool.apply_async(num_math.lagrangePoly, (task_input.task_id, task_input.a, task_input.b))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
+    return {"response": "OK"}
 
-@app.route("/num_math/taylor_approximation", methods=["POST"])
-@validate()
-async def approximateTaylorPoly_(body: classes.TaylorOptions):
-    res = pool.apply_async(num_math.approximateTaylorPoly, (body.task_id, body.f, body.x0, body.order))
+@app.post("/num_math/taylor_approximation")
+async def approximateTaylorPoly_(task_input: classes.TaylorOptions):
+    res = pool.apply_async(num_math.approximateTaylorPoly, (task_input.task_id, task_input.f, task_input.x0, task_input.order))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
+    return {"response": "OK"}
 
-@app.route("/num_math/heat_equation", methods=["POST"])
-@validate()
-async def calcAnimUp_(body: classes.HeatOptions):
-    res = pool.apply_async(heat_equation.calcAnimUp, (body.task_id, body))
+@app.post("/num_math/heat_equation")
+async def calcAnimUp_(task_input: classes.HeatOptions):
+    res = pool.apply_async(heat_equation.calcAnimUp, (task_input.task_id, task_input))
     try:
         res.get(timeout=1)
     except:
         pass
-    return "OK"
-
-if __name__ == "__main__":
-    app.run()
+    return {"response": "OK"}
