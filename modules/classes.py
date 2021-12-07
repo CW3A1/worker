@@ -43,3 +43,18 @@ class HeatOptions(BaseModel):
     T: float = 5
     FPS: int = 15
     BOUNDARY_CONDITION: str = "NO_FLUX"
+
+class SymDiffOptions(BaseModel):
+    f: str = "sin(x)"
+    o: int = 1
+
+class SymIntOptions(BaseModel):
+    f: str = "sin(x)"
+
+class SymLimitOptions(BaseModel):
+    f: str = "sin(x)/x"
+    x0: float = 0
+    dir: int = 0
+
+class SymSolverOptions(BaseModel):
+    f: str = "sin(x)"

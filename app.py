@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from modules import classes, heat_equation, num_math
+from modules import classes, heat_equation, num_math, sym_math
 
 app = FastAPI()
 
@@ -70,6 +70,42 @@ async def approximateTaylorPoly_(task_input: classes.TaylorOptions):
 @app.post("/num_math/heat_equation")
 async def calcAnimUp_(task_input: classes.HeatOptions):
     res = pool.apply_async(heat_equation.calcAnimUp, (task_input.task_id, task_input))
+    try:
+        res.get(timeout=1)
+    except:
+        pass
+    return {"response": "OK"}
+
+@app.post("/sym_math/sym_diff")
+async def symDiff_(task_input: classes.SymDiffOptions):
+    res = pool.apply_async(sym_math.sym_diff, (task_input.task_id, task_input.f, task_input.o))
+    try:
+        res.get(timeout=1)
+    except:
+        pass
+    return {"response": "OK"}
+
+@app.post("/sym_math/sym_int")
+async def symInt_(task_input: classes.SymIntOptions):
+    res = pool.apply_async(sym_math.sym_int, (task_input.task_id, task_input.f))
+    try:
+        res.get(timeout=1)
+    except:
+        pass
+    return {"response": "OK"}
+
+@app.post("/sym_math/sym_limit")
+async def symLimit_(task_input: classes.SymLimitOptions):
+    res = pool.apply_async(sym_math.sym_limit, (task_input.task_id, task_input.f, task_input.x0, task_input.dir))
+    try:
+        res.get(timeout=1)
+    except:
+        pass
+    return {"response": "OK"}
+
+@app.post("/sym_math/sym_solver")
+async def symSolver_(task_input: classes.SymSolverOptions):
+    res = pool.apply_async(sym_math.sym_solver, (task_input.task_id, task_input.f))
     try:
         res.get(timeout=1)
     except:
