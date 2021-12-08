@@ -11,7 +11,7 @@ def sym_diff(task_id: str, function: str, order: int):
             a = sym.diff(symfunc)
             symfunc = a
             i += 1
-        result = symfunc
+        result = str(symfunc)
         result = {'result': result}
         add_log(f"Calculated symbolic derivative for task {task_id}")
     except:
@@ -24,7 +24,7 @@ def sym_int(task_id: str, function: str):
     try:
         symfunc = parseString(function)
         a = sym.integrate(symfunc)
-        result = a
+        result = str(a)
         result = {'result': result}
         add_log(f"Calculated symbolic integral for task {task_id}")
     except:
@@ -42,7 +42,7 @@ def sym_limit(task_id: str, function: str, x0: float, dir: int):
             a = sym.limit(symfunc,sym.Symbol('x'),x0, '+')
         else:
             a = sym.limit(symfunc,sym.Symbol('x'),x0)
-        result = a
+        result = float(a)
         result = {"result": result}
         add_log(f"Calculated limit for task {task_id}")
     except:
@@ -54,7 +54,7 @@ def sym_limit(task_id: str, function: str, x0: float, dir: int):
 def sym_solver(task_id: str, function: str):
     try:
         symfunc = parseString(function)
-        result = sym.solve(symfunc)
+        result = [str(i) for i in sym.solve(symfunc)]
         result = {"result": result}
         add_log(f"Calculated roots for task {task_id}")
     except:
