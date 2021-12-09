@@ -44,7 +44,7 @@ def numInt(task_id: str, f: str, a: float, b: float):
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"pstring": latex(parseString(f)), "result": result[0], "err": result[1], "link": link}
+        result = {"pstring": latex(parseString(f)), "result": result[0], "err": latex(result[1]).replace(r"\\cdot", "\cdot"), "link": link}
     except:
         result = {"pstring": "error", "result": "error", "err": "error", "link": "error"}
         add_log(f"Failed to calculate integral for task {task_id}")
