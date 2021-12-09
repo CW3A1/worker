@@ -50,7 +50,7 @@ def sym_limit(task_id: str, function: str, x0: float, dir: int):
 def sym_solver(task_id: str, function: str):
     try:
         symfunc = parseString(function)
-        result = [str(i) for i in sym.solve(symfunc)]
+        result = [latex(i) for i in sym.solve(symfunc)]
         result = {"result": result}
         add_log(f"Calculated roots for task {task_id}")
     except:
