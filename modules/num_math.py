@@ -17,36 +17,36 @@ from modules.gen import *
 
 def numDiff(task_id: str, f: str, a: float, o: int = 1):
     try:
-        f = evalString(f)
-        result = derivative(f, a, n=o, order=max(o+1+(o)%2, 7))
+        c = evalString(f)
+        result = derivative(c, a, n=o, order=max(o+1+(o)%2, 7))
         add_log(f"Calculated derivative for task {task_id}")
         try:
-            link = plotDiff(f, a, o)
+            link = plotDiff(c, a, o)
             add_log(f"Generated plot for for task {task_id}")
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"result": result, "link": link}
+        result = {"pstring": latex(parseString(f)), "result": result, "link": link}
     except:
-        result = {"result": "error", "link": "error"}
+        result = {"pstring": "error", "result": "error", "link": "error"}
         add_log(f"Failed to calculate derivative for task {task_id}")
     finally:
         postToDB(task_id, result)
 
 def numInt(task_id: str, f: str, a: float, b: float):
     try:
-        f = evalString(f)
-        result = quad(f, a, b)
+        c = evalString(f)
+        result = quad(c, a, b)
         add_log(f"Calculated integral for task {task_id}")
         try:
-            link = plotIntegral(f, a, b)
+            link = plotIntegral(c, a, b)
             add_log(f"Generated plot for task {task_id}")
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"result": result[0], "err": result[1], "link": link}
+        result = {"pstring": latex(parseString(f)), "result": result[0], "err": result[1], "link": link}
     except:
-        result = {"result": "error", "err": "error", "link": "error"}
+        result = {"pstring": "error", "result": "error", "err": "error", "link": "error"}
         add_log(f"Failed to calculate integral for task {task_id}")
     finally:
         postToDB(task_id, result)
@@ -54,15 +54,15 @@ def numInt(task_id: str, f: str, a: float, b: float):
 def twoDNumOpt(task_id: str, f: str, x_l=-512, x_u=512, y_l=-512, y_u=512):
     try:
         bounds = [(x_l, x_u),(y_l, y_u)]
-        f = evalString(f, free_vars={x, y})
+        c = evalString(f, free_vars={x, y})
         def fun(z):
-            nonlocal f
-            return f(z[0], z[1])
+            nonlocal c
+            return c(z[0], z[1])
         res = dual_annealing(fun, bounds)
-        result = {"vector": list(res.x) + [res.fun]}
+        result = {"pstring": latex(parseString(f)), "vector": list(res.x) + [res.fun]}
         add_log(f"Calculated global minimum for task {task_id}")
     except:
-        result = {"result": "error"}
+        result = {"pstring": "error", "vector": "error"}
         add_log(f"Failed to calculate global minimum for task {task_id}")
     finally:
         postToDB(task_id, result)
@@ -98,9 +98,9 @@ def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"result": latex(parseString(poly_taylor_string)), "link": link}
+        result = {"pstring": latex(parseString(f)), "result": latex(parseString(poly_taylor_string)), "link": link}
     except:
-        result = {"result": "error", "link": "error"}
+        result = {"pstring": "error", "result": "error", "link": "error"}
         add_log(f"Failed to calculate Taylor approximation for task {task_id}")
     finally:
         postToDB(task_id, result)
