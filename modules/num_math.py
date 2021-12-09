@@ -10,6 +10,7 @@ from scipy.optimize import dual_annealing
 from scipy.special import factorial
 from sympy import Float, preorder_traversal, simplify
 from sympy.abc import *
+from sympy.printing.latex import latex
 
 from modules.gen import *
 
@@ -78,7 +79,7 @@ def lagrangePoly(task_id: str, a: List[float], b: List[float]):
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"result": poly_lagrange_string, "link": link}
+        result = {"result": latex(parseString(poly_lagrange_string)), "link": link}
     except:
         result = {"result": "error", "link": "error"}
         add_log(f"Failed to calculate Lagrange polynomial for task {task_id}")
@@ -97,7 +98,7 @@ def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
         except:
             link = "error"
             add_log(f"Failed to generate plot for task {task_id}")
-        result = {"result": poly_taylor_string, "link": link}
+        result = {"result": latex(parseString(poly_taylor_string)), "link": link}
     except:
         result = {"result": "error", "link": "error"}
         add_log(f"Failed to calculate Taylor approximation for task {task_id}")

@@ -1,4 +1,5 @@
 import sympy as sym
+from sympy.printing.latex import latex
 
 from modules.gen import *
 
@@ -6,13 +7,9 @@ from modules.gen import *
 def sym_diff(task_id: str, function: str, order: int):
     try:
         symfunc = parseString(function)
-        i = 1
-        while i<=order:
-            a = sym.diff(symfunc)
-            symfunc = a
-            i += 1
-        result = str(symfunc)
-        result = {'result': result}
+        for i in range(order):
+            symfunc = sym.diff(symfunc)
+        result = {'result': latex(symfunc)}
         add_log(f"Calculated symbolic derivative for task {task_id}")
     except:
         result = {'result': 'error'}
@@ -24,8 +21,7 @@ def sym_int(task_id: str, function: str):
     try:
         symfunc = parseString(function)
         a = sym.integrate(symfunc)
-        result = str(a)
-        result = {'result': result}
+        result = {'result': latex(a)}
         add_log(f"Calculated symbolic integral for task {task_id}")
     except:
         result = {'result': 'error'}
