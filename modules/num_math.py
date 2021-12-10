@@ -39,7 +39,7 @@ def numInt(task_id: str, f: str, a: float, b: float):
         result = quad(c, a, b)
         add_log(f"Calculated integral for task {task_id}")
         try:
-            link = plotIntegral(c, a, b)
+            link = plotIntegral(f, a, b)
             add_log(f"Generated plot for task {task_id}")
         except:
             link = "error"
@@ -93,7 +93,7 @@ def approximateTaylorPoly(task_id: str, f: str, x0: float, degree: int):
         poly_taylor_string = oneDPolyToStr(poly_taylor)
         add_log(f"Calculated Taylor approximation for task {task_id}")
         try:
-            link = plotTaylor(f, poly_taylor_string, x0)
+            link = plotTaylor(f, x0, degree)
             add_log(f"Generated plot for for task {task_id}")
         except:
             link = "error"
@@ -119,7 +119,7 @@ def plotDiff(f: str, a: float, o: int):
     else:
         afgeleide = []
         for i in dx[1:len(dx) - 1]:
-            afgeleide.append(derivative(f, i, n=o, order=max(o+1+(o)%2, 7)))
+            afgeleide.append(derivative(fun, i, n=o, order=max(o+1+(o)%2, 7)))
         plt.plot(dx[1: len(dx) - 1], afgeleide, '#1f2937')
         legend_approximation = "Derivative"
         a_vector = [a] * 5
@@ -129,7 +129,7 @@ def plotDiff(f: str, a: float, o: int):
         else:
             vert_points = numpy.linspace(f_accent_a, 0, num=5)
         plt.plot(a_vector, vert_points, color='r')
-    f_vector = vectorize(f)
+    f_vector = vectorize(fun)
     f = f_vector(dx)
     plt.plot(dx, f, '#5599ff')
     plt.xlabel("X-axis")
@@ -145,14 +145,15 @@ def plotDiff(f: str, a: float, o: int):
     link = uploadToUguu(f)
     return link
 
-def plotIntegral(f, a: float, b: float):
+def plotIntegral(f: str, a: float, b: float):
+    fun = evalString(f)
     x_begin = a - (b-a)*0.2
     x_eind = b + (b-a)*0.2
     dx_lang = numpy.linspace(start=x_begin, stop= x_eind, num = 51)
     dx_kort = numpy.linspace(start=a, stop=b, num = 51)
     plot = plt.figure()
-    plt.plot(dx_lang, f(dx_lang), '#1f2937')
-    plt.fill_between(dx_kort, f(dx_kort), y2=0, color= '#5599ff')
+    plt.plot(dx_lang, fun(dx_lang), '#1f2937')
+    plt.fill_between(dx_kort, fun(dx_kort), y2=0, color= '#5599ff')
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.legend(['Integrand', 'Value of integral'])
@@ -190,18 +191,17 @@ def plotTaylor(f: str, a: float, o: int):
             taylor_round = taylor_round.subs(r, round(r, 1))
     taylor_lambda = lambdify(x, taylor_round)
     dx = linspace(start=0 if a>0 else (2*a if a<0 else -10), stop=2*a if a>0 else (0 if a<0 else 10), num = 100)
-    f_vector = vectorize(f)
+    f_vector = vectorize(fun)
     taylor_vector = vectorize(taylor_lambda)
     taylor = taylor_vector(dx)
     fv = f_vector(dx)
     plt.plot(dx, taylor, color = "#1f2937")
     plt.plot(dx, fv, color = "#5599ff")
-    plt.scatter(a,f(a),color='r')
+    plt.scatter(a,fun(a),color='r')
     plt.xlabel("X-axis")
     plt.ylabel('Y-axis')
     plt.title('Taylor approximation')
     plt.legend(['Taylor approximation','Original function'])
-    plt.show()
     f = f"/tmp/{time()}.png"
     plt.savefig(f)
     link = uploadToUguu(f)
