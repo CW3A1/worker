@@ -21,7 +21,7 @@ def numDiff(task_id: str, f: str, a: float, o: int = 1):
         result = derivative(c, a, n=o, order=max(o+1+(o)%2, 7))
         add_log(f"Calculated derivative for task {task_id}")
         try:
-            link = plotDiff(c, a, o)
+            link = plotDiff(f, a, o)
             add_log(f"Generated plot for for task {task_id}")
         except:
             link = "error"
