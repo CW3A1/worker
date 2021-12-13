@@ -142,6 +142,7 @@ def plotDiff(f: str, a: float, o: int):
         plt.scatter(a, f_accent_a, color='r', linewidths=0.01)
     f = f"/tmp/{time()}.png"
     plt.savefig(f)
+    plt.clf()
     link = uploadToUguu(f)
     return link
 
@@ -160,6 +161,7 @@ def plotIntegral(f: str, a: float, b: float):
     plt.title('Integral of given function')
     f = f"/tmp/{time()}.png"
     plt.savefig(f)
+    plt.clf()
     link = uploadToUguu(f)
     return link
 
@@ -176,6 +178,7 @@ def plotLagrange(f: str, a: List[float], b: List[float]):
     plt.title(f'Lagrange interpolation of given points')
     f = f"/tmp/{time()}.png"
     plt.savefig(f)
+    plt.clf()
     link = uploadToUguu(f)
     return link
 
@@ -204,5 +207,6 @@ def plotTaylor(f: str, a: float, o: int):
     plt.legend(['Taylor approximation','Original function'])
     f = f"/tmp/{time()}.png"
     plt.savefig(f)
+    plt.clf()
     link = uploadToUguu(f)
     return link
