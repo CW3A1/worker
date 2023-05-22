@@ -2,7 +2,7 @@ fastapi==0.70.0
 httptools==0.3.0
 matplotlib==3.4.3
 numpy==1.21.2
-requests==2.22.0
+requests==2.31.0
 requests_toolbelt==0.9.1
 scipy==1.7.1
 sympy==1.9
